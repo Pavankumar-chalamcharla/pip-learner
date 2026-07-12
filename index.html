@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FX Operating System — Trading Academy</title>
+<!--
+  ════════════════════════════════════════════════════════════
+  FX-OS · Forex Learning Operating System
+  Host on GitHub Pages: put this file in your repo as index.html
+  ────────────────────────────────────────────────────────────
+  OPTIONAL GLOBAL SYNC (chat, leaderboard, shared logins):
+  1. Create a free Supabase project.
+  2. SQL editor → run:
+       create table kv (key text primary key, value jsonb, updated timestamptz default now());
+       alter table kv enable row level security;
+       create policy "open" on kv for all using (true) with check (true);
+  3. Fill SUPABASE below with your Project URL and anon key.
+  Leave blank → everything runs locally on each device (demo mode).
+  ════════════════════════════════════════════════════════════
+-->
+<style>
+:root{--ink:#0B1220;--panel:#121C2E;--panel2:#18233A;--line:#243049;--text:#E9EEF8;--dim:#8B98B2;--bull:#2FD180;--bear:#FF5C5C;--gold:#F5C542;--blue:#4FA8FF;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono)}
+button{cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit;color:var(--text)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.btn{background:var(--gold);color:#0B1220;border:none;border-radius:10px;padding:12px 18px;font-weight:800;font-size:15px}
+.btn.buy{background:var(--bull)}.btn.sell{background:var(--bear);color:#fff}
+.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:600}
+.ghost.on{color:var(--gold);border-color:var(--gold)}
+.inp{width:100%;background:#0E1626;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;outline:none}
+.dim{color:var(--dim)}.gold{color:var(--gold)}.bull{color:var(--bull)}.bear{color:var(--bear)}
+h2{font-size:22px;font-weight:800}
+.sub{color:var(--dim);font-size:13px;margin:4px 0 14px}
+.wrap{padding:16px;max-width:640px;margin:0 auto}
+.row{display:flex;gap:8px;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.tag{font-size:10px;letter-spacing:1.5px;font-family:var(--mono)}
+.pill{display:inline-block;padding:3px 9px;border-radius:99px;border:1px solid var(--line);font-size:11px;color:var(--dim)}
+header{position:sticky;top:0;z-index:10;background:rgba(11,18,32,.93);backdrop-filter:blur(8px)}
+nav.bottom{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(14,22,38,.97);border-top:1px solid var(--line);backdrop-filter:blur(8px);z-index:10}
+nav.bottom button{flex:1;background:none;border:none;padding:9px 0 13px;color:var(--dim);font-size:10.5px;font-weight:700}
+nav.bottom button.on{color:var(--gold)}
+nav.bottom .ic{font-size:19px;margin-bottom:2px}
+.ticker{overflow:hidden;border-bottom:1px solid var(--line);background:#0E1626}
+.ticker>div{display:flex;gap:28px;white-space:nowrap;padding:7px 0;width:max-content;animation:tick 24s linear infinite;font-family:var(--mono);font-size:12px}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.ticker>div{animation:none}}
+.toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:12px;font-weight:700;font-size:13px;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.opt{width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:15px;font-weight:600;color:var(--text)}
+.opt.ok{border-color:var(--bull);background:#12281E}
+.opt.bad{border-color:var(--bear);background:#2A1520}
+.lesson-node{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.badge{width:44px;height:44px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;flex-shrink:0;background:#0E1626;border:2px solid var(--line);color:var(--dim)}
+.deep h4{font-size:12px;letter-spacing:2px;font-family:var(--mono);margin:16px 0 6px}
+.deep p,.deep li{font-size:14.5px;line-height:1.6;color:#C4CFE4}
+.deep ul{padding-left:18px}
+.chan{padding:8px 12px;border-radius:99px;border:1px solid var(--line);background:none;color:var(--dim);font-size:12px;font-weight:700;flex-shrink:0}
+.chan.on{color:var(--gold);border-color:var(--gold)}
+.prog{height:10px;background:#0E1626;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.prog>div{height:100%;background:var(--gold);transition:width .3s}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.stat b{font-family:var(--mono);font-size:16px}
+.stat span{display:block;font-size:9.5px;color:var(--dim);margin-top:2px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ═══════════ CONFIG ═══════════ */
+const SUPABASE = { url: "", key: "" };   // ← paste your Supabase project URL + anon key for global sync
+const MENTOR_EMAIL = "pavanupsc050605@gmail.com";
+
+/* ═══════════ STORAGE ADAPTER (Supabase kv table OR localStorage) ═══════════ */
+const remote = () => SUPABASE.url && SUPABASE.key;
+const MEM = {};   // in-memory fallback (e.g. sandboxed previews without localStorage)
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return k in MEM ? MEM[k] : null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} MEM[k]=v; }
+async function kvGet(k, fb=null){
+  try{
+    if(remote()){
+      const r = await fetch(`${SUPABASE.url}/rest/v1/kv?key=eq.${encodeURIComponent(k)}&select=value`,
+        {headers:{apikey:SUPABASE.key, Authorization:"Bearer "+SUPABASE.key}});
+      const j = await r.json();
+      return j.length ? j[0].value : fb;
+    }
+    const v = lsGet(k);
+    return v===null ? fb : JSON.parse(v);
+  }catch(e){ return fb; }
+}
+async function kvSet(k, v){
+  try{
+    if(remote()){
+      await fetch(`${SUPABASE.url}/rest/v1/kv`,{method:"POST",
+        headers:{apikey:SUPABASE.key,Authorization:"Bearer "+SUPABASE.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},
+        body:JSON.stringify({key:k,value:v})});
+      return true;
+    }
+    lsSet(k, JSON.stringify(v)); return true;
+  }catch(e){ return false; }
+}
+const K={users:"fx:users",support:"fx:support",board:"fx:board",chat:c=>"fx:chat:"+c,prog:u=>"fx:prog:"+u};
+
+/* ═══════════ MARKET DATA ═══════════ */
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const SYM={
+ EURUSD:{base:1.0850,vol:.0009,dg:5,ct:100000},GBPUSD:{base:1.2700,vol:.0012,dg:5,ct:100000},
+ USDJPY:{base:152.40,vol:.14,dg:3,ct:1000},XAUUSD:{base:2350,vol:3.4,dg:2,ct:100},BTCUSD:{base:64200,vol:420,dg:1,ct:1}};
+function gen(sym,n=700,seed){
+  const s=SYM[sym],r=rng((seed||Date.now())%2**31);let p=s.base,tr=0;const out=[];
+  for(let i=0;i<n;i++){
+    if(r()<.06)tr=(r()-.5)*s.vol*.9;
+    const o=p;let c=o+tr+(r()-.5)*s.vol*2;
+    const sw=r()<.08?s.vol*(1.5+r()*2):0;
+    const h=Math.max(o,c)+r()*s.vol+(r()<.5?sw:0), l=Math.min(o,c)-r()*s.vol-(r()<.5?sw:0);
+    out.push({o,h,l,c});p=c;
+  }
+  return out;
+}
+const fx=(p)=>p.toFixed(p>500?1:p>5?2:5);
+
+/* ═══════════ CURRICULUM — 17 PHASES ═══════════
+   Deep lesson format: w=what, h=how to use, p=pros, c=cons, u=when to use, n=when NOT, tip=pro tip */
+const PHASES=[
+{ph:"Phase 0 · Foundations",icon:"🌍",color:"#4FA8FF",lessons:[
+ {t:"What is Forex & Who Moves It",deep:{
+  w:"Forex is the $7.5-trillion-a-day over-the-counter (OTC) market where currencies trade in pairs (EUR/USD = euros priced in dollars). There is no central exchange — banks, funds and brokers quote prices to each other electronically.",
+  h:"Understand the food chain: central banks set policy, commercial banks and hedge funds move size, corporations hedge, retail traders (you) ride the waves. Price goes where the big players' orders push it — your job is to read their footprints, not fight them.",
+  p:["Open 24/5 across Sydney→Tokyo→London→New York","Deepest liquidity of any market — instant fills on majors","Low barriers: small accounts, low commissions"],
+  c:["OTC means no central tape — your broker IS your counterparty in many models","Leverage access makes it easy to blow up fast","24h market tempts overtrading and destroys sleep"],
+  u:"Trade during London (12:30–21:30 IST) and New York (18:30–02:30 IST) when volume and clean moves are highest.",
+  n:"Avoid the late-NY/early-Sydney dead zone and Friday's final hours — thin liquidity means random spikes and wide spreads.",
+  tip:"The London–New York overlap (18:30–21:30 IST) is where most daily range is made. If you can only trade 2 hours a day, make it these."},
+  quiz:[
+  {q:"Forex is an OTC market, meaning…",o:["It trades on one central exchange","Dealers trade directly with each other, no central exchange","Only banks may trade","It closes daily at 5pm"],a:1,e:"Over-the-counter = a dealer network, not a centralized exchange like a stock market."},
+  {q:"Which participant sets interest-rate policy that drives long-term currency trends?",o:["Retail traders","Brokers","Central banks","Market makers"],a:2,e:"Central banks (Fed, ECB, BOJ, RBI…) control rates — the deepest fundamental driver."},
+  {q:"Best liquidity and cleanest moves usually occur in…",o:["Sydney session","London–New York overlap","Weekend","Lunch hour in Tokyo"],a:1,e:"The overlap concentrates the world's volume into ~3 hours."}]},
+ {t:"Brokers, Spread & Order Flow",deep:{
+  w:"Your broker routes your orders. Market makers take the other side of your trade internally; ECN/STP brokers pass orders to liquidity providers for a commission. The spread (ask − bid) is your cost on every single trade.",
+  h:"Choose regulated brokers, compare typical spread on YOUR pair during YOUR session, and test withdrawal before scaling. Measure cost per round trip: spread + commission, in pips.",
+  p:["ECN: raw spreads, transparent, no dealing-desk conflict","Market maker: often zero commission, fine for small size"],
+  c:["Market-maker conflict of interest: your loss can be their gain","ECN commissions add up for scalpers","Spreads explode during news — a 1-pip pair can become 15"],
+  u:"Use tight-spread ECN accounts for scalping/intraday; standard accounts are fine for swing trading where 1 pip barely matters.",
+  n:"Never judge a broker by bonus offers. Never scalp a pair whose spread is a large fraction of your target — 2-pip spread on a 6-pip scalp means you need 33% edge just to break even.",
+  tip:"Track your total transaction cost per month. Many 'losing strategies' are actually break-even strategies minus costs."},
+  quiz:[
+  {q:"The spread is…",o:["Broker's monthly fee","Difference between ask and bid","Your profit","Leverage ratio"],a:1,e:"You buy at ask, sell at bid — the gap is an immediate cost."},
+  {q:"An ECN broker primarily earns from…",o:["Your losses","Commission per lot","Deposits","Nothing"],a:1,e:"ECN/STP models route orders out and charge commission, reducing conflict of interest."},
+  {q:"A 2-pip spread matters MOST to…",o:["A scalper targeting 5 pips","A swing trader targeting 300 pips","A long-term investor","Nobody"],a:0,e:"Cost as % of target: 40% for the scalper, under 1% for the swing trader."}]},
+ {t:"Pips, Lots, Leverage & Margin",deep:{
+  w:"Pip = smallest standard move (0.0001; 0.01 on JPY pairs). Lot = position size (1 lot = 100k units ≈ $10/pip on EUR/USD). Leverage lets you control big positions with small margin; margin is the deposit locked to hold the position.",
+  h:"Always compute position size from risk, never from leverage: Lots = (Balance × Risk%) ÷ (SL pips × pip value). Leverage is just the enabler — risk% is the decision.",
+  p:["Micro lots (0.01) let tiny accounts practice with real money safely","High leverage means capital efficiency for professionals"],
+  c:["1:500 leverage turns a 20-pip move against a full-margin position into a wipeout","Margin calls force liquidation at the worst moment"],
+  u:"Use leverage as available headroom while risking 0.5–1% per trade — your effective leverage stays tiny even if your account offers 1:500.",
+  n:"Never size a trade by 'how many lots CAN I open' — that's how accounts die in one news candle.",
+  tip:"Memorize: 0.01 lot ≈ $0.10/pip on EUR/USD. Every sizing calculation becomes mental math from there."},
+  quiz:[
+  {q:"$5,000 account, 1% risk, 25-pip stop on EUR/USD. Correct size ≈",o:["2.0 lots","0.2 lots","0.02 lots","5 lots"],a:1,e:"$50 risk ÷ (25 × $10) = 0.2 lots."},
+  {q:"USD/JPY moves 152.40 → 152.85. Pips?",o:["4.5","45","450","0.45"],a:1,e:"JPY pip = 0.01, so 0.45 / 0.01 = 45 pips."},
+  {q:"Margin is…",o:["Broker profit","Collateral locked to hold a leveraged position","A type of order","The spread"],a:1,e:"It's your good-faith deposit; run out of free margin and positions get force-closed."}]}
+]},
+{ph:"Phase 1 · Price Action Basics",icon:"🕯️",color:"#2FD180",lessons:[
+ {t:"Candles & Candle Psychology",deep:{
+  w:"Each candle = Open, High, Low, Close for its period. The body shows the net battle result; wicks show rejected excursions. A chart is a crowd-psychology record, not lines.",
+  h:"Read three things per candle: body size (conviction), wick direction (rejection), close location (who won). A close in the top 20% of the range = buyers finished in control.",
+  p:["Instant, indicator-free read of sentiment","Works on every market and timeframe"],
+  c:["Single candles lie constantly — context is mandatory","Low-liquidity candles (Sydney, holidays) reflect noise, not intent"],
+  u:"Use candle reads AT levels — support, order blocks, session opens — where a rejection actually means something.",
+  n:"Don't trade pattern names in the middle of a range. A hammer at nothing is nothing.",
+  tip:"Ask of every big wick: WHOSE stops just got taken? That question converts candle-reading into liquidity-reading."},
+  quiz:[
+  {q:"A candle closing in the top 10% of its range shows…",o:["Seller control","Buyer control at the close","Indecision","Low volume"],a:1,e:"Where price CLOSES tells you who won the period."},
+  {q:"Long upper wick after a rally into resistance =",o:["Bullish continuation","Sellers rejected higher prices","Broker error","Buy signal"],a:1,e:"Price was pushed up and slammed back — supply showed up."},
+  {q:"Candle patterns are most reliable when…",o:["Alone on a random spot","Confirming a key level or structure","On 1-second charts","Colored differently"],a:1,e:"Location gives the pattern its meaning."}]},
+ {t:"Trends, Ranges, Support & Resistance",deep:{
+  w:"Uptrend = higher highs + higher lows. Downtrend = the mirror. Range = price oscillating between a defined floor (support) and ceiling (resistance) while both sides absorb orders.",
+  h:"Mark levels where price REACTED multiple times, treat them as zones (not lines), and let the market show its hand: trend traders buy pullbacks to HLs; range traders fade the extremes.",
+  p:["S/R zones give logical stop placement (beyond the zone)","Trend-following puts probability at your back"],
+  c:["Ranges chop trend-followers to death","Everyone sees the same obvious level — which is exactly why stops there get hunted"],
+  u:"Trade trend continuation after a pullback holds a higher low; trade ranges only when both boundaries have proven themselves twice.",
+  n:"Don't counter-trend just because price 'has gone too far.' Trends run further than logic suggests.",
+  tip:"The most powerful level is the FLIP: broken resistance retested as support. Old ceiling, new floor."},
+  quiz:[
+  {q:"An uptrend structurally requires…",o:["Higher highs and higher lows","Green candles only","RSI above 50","News"],a:0,e:"Structure, not color, defines trend."},
+  {q:"The 'flip' refers to…",o:["Reversing your position","Broken resistance acting as support","Changing timeframes","A candlestick"],a:1,e:"Breakout buyers defend the retest of the broken level."},
+  {q:"Range trading works best when…",o:["Boundaries are untested","Both boundaries have held multiple times","A trend just started","During NFP"],a:1,e:"Proven boundaries = proven order clusters."}]},
+ {t:"Breakouts, Fakeouts & Pullbacks",deep:{
+  w:"Breakout = price closing and HOLDING beyond a level. Fakeout (sweep) = piercing the level, grabbing stops, and reversing. Pullback = a counter-move within a trend that offers late entry.",
+  h:"Demand confirmation: a close beyond the level plus a successful retest = breakout. A fast wick-through-and-reclaim = fakeout — often the better trade, in the OPPOSITE direction.",
+  p:["Breakout+retest entries have clearly defined invalidation","Fakeout reversals offer elite risk:reward (stop just past the sweep wick)"],
+  c:["Most raw breakouts fail — chasing the first candle buys the top","Waiting for retests means sometimes missing runners"],
+  u:"Trade breakouts in the direction of the higher-timeframe trend; trade fakeouts when a sweep hits an obvious equal-highs/lows pool.",
+  n:"Never chase a breakout candle that is already 2× ATR extended — your stop distance becomes absurd.",
+  tip:"Write this down: amateurs trade the break, professionals trade the RETEST or the FAILURE of the break."},
+  quiz:[
+  {q:"The most reliable breakout confirmation is…",o:["The first big candle","A close beyond + successful retest","High volume alone","A tweet"],a:1,e:"Break + hold + retest filters the majority of traps."},
+  {q:"A fakeout through equal highs that instantly reverses is a signal to consider…",o:["Buying the high","Selling — stops were swept","Closing the platform","Adding leverage"],a:1,e:"Sweep of buy-side liquidity + reclaim = classic reversal setup."},
+  {q:"Pullback entries in an uptrend are best taken at…",o:["Random 50% of any candle","Prior structure/zone forming a higher low","All-time highs","The daily close only"],a:1,e:"Structure meeting trend = confluence."}]}
+]},
+{ph:"Phase 2 · Chart Patterns",icon:"📐",color:"#B08CFF",lessons:[
+ {t:"Continuation Patterns: Flags, Triangles, Wedges",deep:{
+  w:"After an impulse, price often pauses in a compressing shape — flag (parallel drift against trend), pennant/triangle (converging), wedge (converging AND sloped). These are the market refueling.",
+  h:"Measure the pole (the impulse), wait for the compression, enter on break in the impulse direction or the retest; project roughly the pole's length for a target.",
+  p:["Clear invalidation (other side of the pattern)","Measured-move targets give objective TPs"],
+  c:["Patterns are subjective — three traders draw three triangles","In ranges, 'flags' are just noise"],
+  u:"Trade them mid-trend, after a clean impulse, ideally aligned with the higher-timeframe direction.",
+  n:"Skip them at trend exhaustion (after 3+ extended legs) — late flags become reversals.",
+  tip:"The tighter and quieter the flag, the more explosive the resolution tends to be. Compression stores energy."},
+  quiz:[
+  {q:"A bull flag consists of…",o:["Sharp rally + gentle downward drift","Two equal tops","A giant wick","A gap"],a:0,e:"Pole + controlled counter-drift = continuation pause."},
+  {q:"The classic target for a flag breakout is…",o:["Random","The pole's length projected from the breakout","Exactly 100 pips","The weekly open"],a:1,e:"The measured move assumes the second leg mirrors the first."},
+  {q:"Continuation patterns are LEAST trustworthy…",o:["Mid fresh trend","After an extended 3rd or 4th leg","On high timeframes","At a flip level"],a:1,e:"Late-stage patterns often mark distribution, not continuation."}]},
+ {t:"Reversal Patterns: Double Tops, H&S",deep:{
+  w:"Double top/bottom = two failed attempts at the same extreme. Head & Shoulders = a failed higher high (head) followed by a lower high (right shoulder) — trend structure visibly breaking.",
+  h:"The pattern is only CONFIRMED when the neckline breaks. Aggressive entry: the right-shoulder lower high. Conservative: neckline break + retest. Target: pattern height projected.",
+  p:["Maps directly onto structure logic (failed HH = CHoCH warning)","Neckline gives objective trigger and invalidation"],
+  c:["'Double tops' mid-range fail constantly","The second top is often swept first (a sweep ABOVE top 1) — early shorts get stopped"],
+  u:"Trade them after extended trends into higher-timeframe resistance, especially when the second extreme SWEEPS the first and rejects.",
+  n:"Never short a double top just because two tops exist — without a neckline break you're fading an uptrend.",
+  tip:"The best double tops aren't double at all: top 2 wicks ABOVE top 1 (stop hunt), then collapses. Equal tops usually break."},
+  quiz:[
+  {q:"An H&S pattern confirms when…",o:["The head forms","The neckline breaks","RSI hits 70","Volume drops"],a:1,e:"Until the neckline goes, the uptrend is technically intact."},
+  {q:"A second top that WICKS above the first then reverses hard suggests…",o:["Breakout — go long","A liquidity sweep — reversal fuel","Nothing","Broker manipulation only"],a:1,e:"Stops above top 1 were harvested; that's institutional fingerprints."},
+  {q:"Reversal patterns carry the most weight when they form…",o:["Anywhere","At major higher-timeframe levels after extended trends","Only on Mondays","In dead sessions"],a:1,e:"Location + exhaustion + pattern = real signal."}]}
+]},
+{ph:"Phase 3 · Technical Indicators",icon:"📊",color:"#4FD8E8",lessons:[
+ {t:"Moving Averages, EMA & VWAP",deep:{
+  w:"MAs average past closes to smooth trend: SMA weighs all bars equally, EMA weights recent bars more (reacts faster), VWAP is the volume-weighted average price — the institutional 'fair price' of the session.",
+  h:"Use slope + price position for bias (above rising 50 EMA = bullish), crossovers (20/50) as regime filters, and VWAP as the intraday value magnet: above VWAP buyers are in control, below it sellers are.",
+  p:["Objective, unemotional trend filter","Dynamic support/resistance in strong trends","VWAP is what many funds benchmark execution to — self-fulfilling"],
+  c:["ALL MAs lag — signals come after the move begins","Crossovers get shredded in ranges (whipsaw)"],
+  u:"Trending markets, higher timeframes, and as a filter ('only long above 200 EMA') rather than an entry trigger.",
+  n:"Ranging/choppy conditions — MAs flatten and cross endlessly. Your own backtests showed this: MA(20/50) survived on trending XAUUSD, not on choppy pairs.",
+  tip:"One habit worth stealing: check the daily 200 EMA before every trade. Fighting it is fighting the ocean current."},
+  quiz:[
+  {q:"EMA vs SMA — the EMA…",o:["Ignores recent data","Weights recent prices more heavily","Is always higher","Uses volume"],a:1,e:"Exponential weighting = faster reaction, slightly more noise."},
+  {q:"Intraday price holding above VWAP suggests…",o:["Sellers control the session","Buyers control the session","No information","Market closed"],a:1,e:"Longs from the session average are in profit — dips get bought."},
+  {q:"MA crossover systems perform worst in…",o:["Strong trends","Sideways ranges","Bull markets","High volume"],a:1,e:"No trend = endless false crosses. This is THE known weakness."}]},
+ {t:"RSI — The Complete Treatment",deep:{
+  w:"RSI (Relative Strength Index, 14-period default) measures the speed of recent gains vs losses on a 0–100 scale. Above 70 is labeled 'overbought', below 30 'oversold' — but those labels are where most retail misuse begins.",
+  h:"Three professional uses: (1) DIVERGENCE — price makes a new high but RSI makes a lower high → momentum dying, watch for reversal WITH structure confirmation. (2) REGIME READ — RSI holding 40–80 = bull regime; 20–60 = bear regime. The 40/60 zone acting as RSI-support/resistance tells you the trend. (3) FAILURE SWINGS — RSI breaking its own prior low while price is at highs.",
+  p:["Divergence is one of the few leading (not lagging) signals in TA","Works on all instruments and timeframes","Simple to read at a glance"],
+  c:["'Overbought' is NOT a sell signal — strong trends pin RSI above 70 for weeks","Divergences can stack 2–3 times before price actually turns","Useless in fresh breakouts where momentum SHOULD be extreme"],
+  u:"Use it in established ranges (fade 70/30 back toward the mean) and for divergence at higher-timeframe levels after extended trends.",
+  n:"NEVER counter-trend purely on an overbought/oversold reading during a strong trend or news-driven move — that's the single most expensive RSI mistake. And never use RSI as a standalone entry: it's a filter/confirmation tool.",
+  tip:"Flip the retail logic: in a strong uptrend, RSI dipping to 40–50 is a BUY zone (momentum pullback), not a warning. The indicator's best signals are the opposite of its default labels."},
+  quiz:[
+  {q:"In a powerful uptrend, RSI at 78 most reasonably means…",o:["Immediate short","Strong momentum — trend intact","Guaranteed top","Broker error"],a:1,e:"Overbought readings are a FEATURE of strong trends, not a fade signal."},
+  {q:"Bearish divergence is…",o:["Price lower high, RSI higher high","Price higher high, RSI lower high","Both making highs","RSI at exactly 50"],a:1,e:"Momentum failing to confirm the new price high warns of exhaustion."},
+  {q:"When should RSI NOT drive a counter-trend trade?",o:["In a quiet range","During a strong trending/news-driven move","At a major HTF level with divergence","Never"],a:1,e:"Fading raw momentum on an oscillator label is how trends run you over."},
+  {q:"In a bull regime, RSI pullbacks tend to find support around…",o:["10","40–50","70","90"],a:1,e:"The 40–50 zone acting as RSI floor is a trend-health signal."}]},
+ {t:"MACD, Stochastic, ATR & Bollinger",deep:{
+  w:"MACD = two EMAs' gap + its average (trend-momentum). Stochastic = close's position within recent range (overbought/oversold, faster than RSI). ATR = average candle range (pure volatility, no direction). Bollinger Bands = 20 SMA ± 2 standard deviations (volatility envelope).",
+  h:"MACD: zero-line side = trend bias; histogram shrinking = momentum fading. Stochastic: use only WITH the trend (buy oversold in uptrends). ATR: set stops at 1.5–2× ATR and size positions from it. Bollinger: band squeeze = explosion coming; riding the band = strong trend (NOT a fade).",
+  p:["ATR-based stops adapt automatically to conditions — gold vs EURUSD, calm vs news","MACD is decent at filtering trend direction on H4/Daily","Squeezes objectively flag pre-breakout compression"],
+  c:["MACD lags badly — late in, late out","Stochastic fires constant false signals in trends","Touching a Bollinger band is NOT a signal by itself — the most common misuse"],
+  u:"Combine one trend tool (MACD/MA) + one volatility tool (ATR) + structure. ATR belongs in EVERY system for stops/sizing.",
+  n:"Don't stack five oscillators — they're all cousins of the same price data and will agree while being collectively wrong. Two indicators max.",
+  tip:"If you keep one indicator forever, make it ATR. It never predicts, never lies, and quietly fixes your two biggest leaks: stops inside the noise and inconsistent risk."},
+  quiz:[
+  {q:"ATR measures…",o:["Trend direction","Average volatility per candle","Volume","Sentiment"],a:1,e:"True range averaged — how much the market breathes, direction-blind."},
+  {q:"Price 'walking' up the upper Bollinger band signals…",o:["An automatic short","A strong trend in progress","A calm range","A gap"],a:1,e:"Band-riding is trend strength; fading it is the classic error."},
+  {q:"ATR doubles. Your lot size for identical $ risk should…",o:["Double","Halve","Stay","Quadruple"],a:1,e:"Wider stop (in an ATR world) → proportionally smaller size."}]}
+]},
+{ph:"Phase 4 · Advanced Price Action",icon:"🧱",color:"#FF9A5C",lessons:[
+ {t:"Order Blocks & Supply/Demand",deep:{
+  w:"An order block is the last opposite-direction candle (or base) before an impulsive move that broke structure — the footprint of institutional accumulation. Supply/demand zones are the same idea drawn as areas.",
+  h:"Qualify OBs: did the move from it cause a BOS or sweep? Is it unmitigated (price hasn't returned)? Refine to the candle body or 50% level. Entry: limit order in the zone, stop beyond it, target the next pool of liquidity.",
+  p:["Entries at the origin of moves = tight stops, big RR","Objective zone rules reduce impulse entries"],
+  c:["Every down-candle is NOT an order block — over-marking is epidemic","Old, multiple-times-tested zones decay"],
+  u:"Fresh OBs that caused structural breaks, aligned with HTF bias, reached by a liquidity sweep.",
+  n:"Skip mid-range OBs and third+ retests. If price consolidated ON the zone, the orders are spent.",
+  tip:"Grade every OB before entry: caused BOS? unmitigated? HTF aligned? swept liquidity to reach it? 3/4 or no trade."},
+  quiz:[
+  {q:"A valid bullish order block should have…",o:["Any red candle","Caused a break of structure upward","Five retests","High RSI"],a:1,e:"No structural consequence = no institutional footprint."},
+  {q:"'Unmitigated' means…",o:["Untested — price hasn't returned yet","Broken","Old","Confirmed by MACD"],a:0,e:"First return to the zone is where remaining orders sit."},
+  {q:"An OB tested for the 4th time is…",o:["Stronger than ever","Likely exhausted","Guaranteed","A breaker"],a:1,e:"Each test consumes resting orders."}]},
+ {t:"BOS, CHoCH & FVG",deep:{
+  w:"BOS = structure breaking WITH the trend (continuation). CHoCH = the first break AGAINST it (the last higher low fails) — earliest reversal evidence. FVG = a 3-candle imbalance gap that price often revisits to 'rebalance' before continuing.",
+  h:"Map structure on your HTF (H4/D1) for bias, then hunt entries on LTF: sweep → CHoCH → return to FVG/OB inside the leg → enter with stop past the sweep. This sweep→CHoCH→FVG sequence is the core SMC playbook.",
+  p:["Pure structure — works without a single indicator","CHoCH gives you reversal entries near the extreme, not late"],
+  c:["On low timeframes CHoCHs appear constantly — noise","Choosing which swing counts as 'structure' is a skill that takes months"],
+  u:"After liquidity events at HTF levels. A CHoCH following a sweep of a major high/low is the highest-quality reversal print.",
+  n:"Don't act on every M1 CHoCH — without HTF context you're day-trading static.",
+  tip:"One HTF chart for the story, one LTF chart for the trigger. Two timeframes, one narrative — more and you'll find reasons for anything."},
+  quiz:[
+  {q:"CHoCH in an uptrend =",o:["Break above a high","Break below the last higher low","MA cross","A doji"],a:1,e:"The trend's staircase step failing is the character change."},
+  {q:"FVGs form because…",o:["Brokers gap prices","One-sided aggressive orders leave an unfilled imbalance","Weekends","Indicators lag"],a:1,e:"Price moved so fast one side never traded — a magnet for rebalance."},
+  {q:"The premium SMC reversal sequence is…",o:["News → hope → entry","Sweep → CHoCH → FVG/OB retrace entry","RSI 70 → short","Gap → chase"],a:1,e:"Liquidity grab, structural shift, then discounted entry."}]},
+ {t:"Premium/Discount & Mitigation",deep:{
+  w:"Any trading range can be split at its 50% (equilibrium): above = premium (expensive), below = discount (cheap). Institutions sell premium, buy discount. Mitigation = price returning to a zone where trapped positions/unfilled orders wait.",
+  h:"Draw the dealing range (last major swing low→high), only take longs in the discount half and shorts in the premium half of your bias's range. Combine: bullish bias + discount + OB/FVG = A-grade long.",
+  p:["Stops buying tops/selling bottoms — mechanically","Stacks cleanly with OB/FVG entries"],
+  c:["Ranges must be drawn from the RIGHT swings — garbage range, garbage equilibrium","In runaway trends price stays premium for ages"],
+  u:"Established dealing ranges after a clear impulse; pullback entries.",
+  n:"Fresh breakouts/news trends — waiting for a 50% discount can mean missing the whole move; that's the tradeoff.",
+  tip:"Before every entry ask one question: am I buying cheap or buying comfortable? Comfort usually lives in premium."},
+  quiz:[
+  {q:"Equilibrium of a dealing range is…",o:["The high","The 50% level","The low","Yesterday's close"],a:1,e:"Above = premium, below = discount."},
+  {q:"With bullish bias, A-grade entries occur in…",o:["Premium","Discount","Either","Outside the range"],a:1,e:"Buy cheap in the direction of flow."},
+  {q:"Mitigation refers to price returning to…",o:["The news time","Zones of trapped/unfilled institutional orders","The round number","The weekly open"],a:1,e:"Institutions defend or exit at their origin — price gets pulled back to it."}]}
+]},
+{ph:"Phase 5 · Smart Money Deep",icon:"🐋",color:"#F5C542",lessons:[
+ {t:"Liquidity Engineering & Inducement",deep:{
+  w:"Liquidity = clusters of stops and pending orders (above equal highs, below equal lows, at trendline touches). Inducement = the market DELIBERATELY building an obvious 'setup' that attracts retail entries whose stops become the fuel for the real move.",
+  h:"Before entries, map where the crowd's stops are: equal highs/lows, obvious trendlines, round numbers. Expect price to RAID those pools first. Enter after the raid, not before — let the crowd be the liquidity.",
+  p:["Explains 'stop hunt then reverse' — the most common retail pain — as a tradable pattern","Turns obvious levels from traps into signals"],
+  c:["Can slide into paranoia — not every wick is manipulation","Requires patience to wait for the raid; you'll skip trades that 'worked'"],
+  u:"When you see textbook-obvious patterns (clean equal highs, perfect trendline) assume they're bait until swept.",
+  n:"Don't apply manipulation logic to genuinely news-driven moves — CPI repricing isn't a hunt, it's information.",
+  tip:"The prettier and more obvious the setup looks, the more likely it exists to be swept. Beauty is bait."},
+  quiz:[
+  {q:"Inducement is…",o:["A broker bonus","Engineered 'setups' that attract retail orders as liquidity","A candlestick","An indicator"],a:1,e:"The crowd's entries and stops become fuel for the real move."},
+  {q:"Equal lows on a chart most likely mean…",o:["A floor that will hold forever","A sell-side liquidity pool likely to be raided","Nothing","Buy immediately"],a:1,e:"Stacked stops below are a target, not a wall."},
+  {q:"The disciplined response to an obvious trendline setup is…",o:["Enter instantly","Wait for the sweep/raid, then judge","Invert your account","Add to losers"],a:1,e:"Let the trap spring on someone else first."}]},
+ {t:"Breakers, Mitigation Blocks & MTF Structure",deep:{
+  w:"A breaker block = an order block that FAILED (was traded through) and flips polarity — old bullish OB becomes resistance. Internal structure = the small swings inside a larger leg; external = the major swing highs/lows. Multi-timeframe analysis aligns them.",
+  h:"Workflow: D1/H4 external structure → directional bias. H1 internal structure → the current leg's story. M5–M15 → sweep/CHoCH trigger inside HTF zones. Breakers give entries when classic OBs fail: trade the retest of the broken zone.",
+  p:["MTF alignment filters the majority of losing counter-trend impulses","Breakers catch the 'failed setup' crowd on the wrong side"],
+  c:["Three timeframes can paralyze — bias, story, trigger; nothing more","Internal noise tempts you to abandon a good HTF thesis early"],
+  u:"Trend-continuation entries (internal pullbacks inside external legs) and reversal confirmation at external extremes.",
+  n:"Never let an M5 pattern override a D1 structure. The elephant doesn't ask the mouse for directions.",
+  tip:"Write your HTF bias on paper before opening the LTF. If the LTF 'changes your mind' within minutes, you had no bias — you had a mood."},
+  quiz:[
+  {q:"A breaker block is…",o:["A fresh OB","A failed OB that flipped polarity","A news candle","Support forever"],a:1,e:"Zones that fail become the other side's weapon."},
+  {q:"External structure refers to…",o:["Minor pullback swings","Major swing highs/lows defining the trend","Other markets","Volume"],a:1,e:"Internal = inside the leg; external = the leg itself."},
+  {q:"Correct MTF hierarchy:",o:["M1 decides everything","HTF bias → mid story → LTF trigger","All equal","Daily only"],a:1,e:"Bias flows downward; triggers flow upward."}]}
+]},
+{ph:"Phase 6 · Fundamental Analysis",icon:"🏦",color:"#FF6FB5",lessons:[
+ {t:"Interest Rates & Central Banks",deep:{
+  w:"Interest rates are gravity for currencies: capital flows toward higher real yield. The Fed, ECB, BOJ, BOE, RBA and RBI set policy through rate decisions, guidance and balance-sheet operations.",
+  h:"Track the EXPECTED path (futures-implied probabilities), not just current rates. Trade the surprise: if markets price a 90% hold and the bank hikes, the repricing is violent. Hawkish tone → currency up; dovish → down.",
+  p:["Drives multi-month trends — the biggest moves in FX are policy-divergence trades","Scheduled events = manageable risk windows"],
+  c:["Priced-in outcomes produce 'sell the news' reversals that punish naive direction bets","Two-way volatility within seconds around statements"],
+  u:"Form a WEEKLY bias from policy divergence (e.g., Fed cutting while ECB holds → EURUSD bullish backdrop) and execute with technicals.",
+  n:"Don't hold leveraged positions through FOMC without a plan. Don't trade the initial spike — the first move frequently reverses when the press conference starts.",
+  tip:"The statement moves price; the press conference moves the TREND. The Q&A is where policy actually leaks."},
+  quiz:[
+  {q:"A surprise hike vs 90%-priced hold causes…",o:["Nothing — priced in","Violent repricing in the currency's favor","A gap down always","Market close"],a:1,e:"Surprises force everyone to reprice simultaneously."},
+  {q:"Policy divergence (Fed cuts, ECB holds) is structurally…",o:["EURUSD bearish","EURUSD bullish","Neutral","Only gold-relevant"],a:1,e:"Yield differential shifts toward the euro."},
+  {q:"'Dovish hold' means the bank…",o:["Hiked aggressively","Held rates but signaled easing bias","Banned trading","Raised margin"],a:1,e:"Tone/guidance can outweigh the decision itself."}]},
+ {t:"CPI, NFP & The Economic Calendar",deep:{
+  w:"CPI (inflation) steers rate expectations; NFP (US jobs, first Friday) reads economy health; PMI/GDP/PPI fill the picture. The economic calendar is your battle map — red events = high impact.",
+  h:"Weekly routine: Sunday, mark every red event on your pairs. Note forecast vs prior. On release: hot CPI → hawkish pressure → USD up (usually); weak NFP → dovish → USD down. Trade the POST-spike trend once spreads normalize (5–15 min).",
+  p:["Foreknowledge of WHEN volatility hits is free risk management","Post-news trends are often the cleanest intraday moves"],
+  c:["First seconds are spread-blowout, slippage chaos","Revisions and details (wages inside NFP) can flip the headline reaction"],
+  u:"Stand aside into the release; hunt the continuation after the repricing settles, aligned with the surprise direction.",
+  n:"Never 'guess the number' with leverage — it's a coin flip with terrible execution. And never leave a tight-stop position running into a red event.",
+  tip:"Ten minutes before red news: flat or protected, always. The market pays patience and executes gamblers."},
+  quiz:[
+  {q:"Hot CPI (above forecast) typically pushes USD…",o:["Down","Up — hawkish rate pressure","Nowhere","Off the charts"],a:1,e:"Higher inflation → higher-for-longer rates → dollar demand."},
+  {q:"NFP is released…",o:["Daily","First Friday monthly","Quarterly","Randomly"],a:1,e:"Non-Farm Payrolls: monthly, first Friday, 18:00 IST (US morning)."},
+  {q:"Professional news play:",o:["All-in 5 seconds before","Trade the post-release trend after spreads settle","Remove stops for freedom","Revenge the spike"],a:1,e:"Let the repricing happen, then join the winning side."}]},
+ {t:"Instrument Profile: GOLD (XAUUSD)",deep:{
+  w:"Gold is the anti-fiat asset: no yield, priced in USD, driven by real interest rates (nominal minus inflation), the dollar index, central-bank buying, and fear. Daily ranges of $20–60 are routine; news candles can travel $30 in minutes — this is a heavyweight, not a starter instrument.",
+  h:"Drivers cheat-sheet: real yields UP → gold DOWN (yield-less asset loses appeal); DXY UP → gold DOWN (usually); war/crisis/bank-stress → gold UP; central banks accumulating → structural floor. Best sessions: London open and NY (COMEX) hours — Asia usually ranges. Trade it with SMC/liquidity logic: gold is the most stop-hunt-prone major instrument; sweeps of session highs/lows are its native language.",
+  p:["Trends HARD when it trends — big clean legs for swing traders","Deep liquidity, tight spreads for its range","Reacts logically to macro (real yields/DXY) — a thinking trader's instrument","Volatility means small size still pays"],
+  c:["Volatility cuts both ways: a casual 0.5-lot habit from EURUSD is 5× the risk here","Whipsaws and $10 wicks eat tight stops for breakfast","Requires macro awareness — pure chartists get blindsided by yield moves","Asia session chop tempts overtrading"],
+  u:"Trade London/NY, after liquidity sweeps at session or daily extremes, with ATR-sized stops (typically $8–15 on M15 setups) and HALF your normal risk until proven.",
+  n:"Avoid: minutes around FOMC/CPI/NFP (spreads triple), the Asia drift (fake moves), and any position sized like a forex pair. If your stop is under 1× ATR(14), you're donating.",
+  tip:"Respect the ocean: veterans size gold at 30–50% of their FX risk and get paid MORE, because the range does the work. Your MT5 backtests already told you this — XAUUSD trends carried the MA strategy while chop killed everything else."},
+  quiz:[
+  {q:"Rising REAL yields typically push gold…",o:["Up","Down","Sideways forever","Off-market"],a:1,e:"Gold pays no yield — when bonds pay more after inflation, gold loses its bid."},
+  {q:"Gold's best trading sessions are…",o:["Asia","London & New York","Weekend","Sydney only"],a:1,e:"COMEX + London flows create the real ranges; Asia mostly drifts."},
+  {q:"Coming from EURUSD, your gold position size should be…",o:["Identical","Larger","Roughly a third to a half","Maximum"],a:2,e:"Same lots ≈ several times the dollar volatility. Size down, let the range pay."},
+  {q:"Gold's market character is famous for…",o:["Never wicking","Frequent liquidity sweeps/stop hunts at key levels","Zero volatility","Ignoring the dollar"],a:1,e:"Sweep-and-reverse at session extremes is gold's signature move."}]}
+]},
+{ph:"Phase 7 · Intermarket Analysis",icon:"🔗",color:"#4FA8FF",lessons:[
+ {t:"DXY, Bonds, Risk-On/Risk-Off",deep:{
+  w:"Markets are one organism: DXY (dollar index) is the sun FX orbits; bond yields express rate expectations; equities express risk appetite. Risk-ON: stocks up, JPY/CHF/gold down, AUD/NZD up. Risk-OFF: the mirror.",
+  h:"Before trading any USD pair, glance at DXY structure — trading EURUSD long while DXY breaks out upward is fighting the tide. Use US10Y yield direction as the macro compass for USDJPY and gold. Classify each day: risk-on, risk-off, or mixed — then pick pairs whose story agrees.",
+  p:["One DXY chart filters bad trades across six pairs at once","Yield/gold and yield/USDJPY correlations are among the most reliable in macro"],
+  c:["Correlations are regimes, not laws — they break precisely when you lean hardest","Adds analysis time; can become procrastination"],
+  u:"Daily bias formation and confluence: EURUSD long + DXY at resistance + risk-on = aligned stars.",
+  n:"Don't trade correlations directly ('gold moved, so USDJPY must…') — lead/lag is unstable intraday.",
+  tip:"EURUSD is ~57% of DXY. If your EURUSD setup contradicts the DXY chart, one of your two analyses is wrong — find out which BEFORE entry."},
+  quiz:[
+  {q:"Risk-OFF days typically see flows INTO…",o:["AUD and stocks","JPY, CHF, gold, USD","Meme coins","Emerging markets"],a:1,e:"Fear buys safety: yen, franc, dollar, gold."},
+  {q:"DXY breaking resistance while you're long EURUSD means…",o:["Perfect confluence","Direct conflict — dollar strength = EURUSD weakness","Nothing","Double the long"],a:1,e:"EURUSD is the biggest DXY component, inversely."},
+  {q:"US 10-year yields ripping higher usually pressures…",o:["Nothing","Gold down, USDJPY up","Gold up","All currencies equally"],a:1,e:"Yield-less gold suffers; rate differentials lift USDJPY."}]}
+]},
+{ph:"Phase 8 · Risk Management",icon:"🛡️",color:"#2FD180",lessons:[
+ {t:"Position Sizing & Risk of Ruin",deep:{
+  w:"Position sizing converts your stop distance into lots such that a loss costs a FIXED small % of equity. Risk of ruin = the mathematical probability your strategy + sizing eventually zeroes the account. At 1% risk it's negligible; at 10% risk it approaches certainty.",
+  h:"The only formula that matters: Lots = (Equity × Risk%) ÷ (SL pips × pip value per lot). Recompute EVERY trade from current equity (anti-martingale: risk shrinks in drawdown, grows in profit). Keep risk constant across instruments via ATR-based stops.",
+  p:["Makes 10-loss streaks survivable (10 × 1% ≈ −9.6%)","Removes the biggest emotional lever — size — from in-trade decisions"],
+  c:["Feels painfully slow when confident","Requires discipline precisely when euphoric or tilted"],
+  u:"Every single trade, forever. Non-negotiable.",
+  n:"There is no market condition where 'this one deserves 10%' is correct. That thought IS the risk.",
+  tip:"Expected value, not win rate, pays you: EV = (Win% × AvgWin) − (Loss% × AvgLoss). A 35% win rate at 1:3 prints money; a 90% win rate risking 50:1 eventually detonates."},
+  quiz:[
+  {q:"$8,000 equity, 1% risk, 40-pip stop, $10/pip/lot →",o:["0.2 lots","2 lots","0.8 lots","0.02 lots"],a:0,e:"$80 ÷ 400 = 0.2 lots."},
+  {q:"Risk of ruin rises fastest with…",o:["Small size","Bigger per-trade risk %","More screen time","Tight spreads"],a:1,e:"Ruin probability compounds explosively with risk size."},
+  {q:"A 35% win-rate strategy at 1:3 RR is…",o:["A losing system","Profitable — positive EV","Break-even","Illegal"],a:1,e:"0.35×3 − 0.65×1 = +0.40R per trade."}]},
+ {t:"Drawdown, Daily Limits & Kelly Caution",deep:{
+  w:"Drawdown asymmetry: −20% needs +25% back; −50% needs +100%. Daily/weekly loss limits are circuit breakers for your psychology. Kelly criterion computes 'optimal' risk from edge — and full Kelly is violently volatile.",
+  h:"Set three lines before the week starts: daily stop (−2 to −3%), weekly stop (−5%), monthly stop (−8%). Hit one → done, walk, journal. If you use Kelly at all, use QUARTER-Kelly as a ceiling, never a target.",
+  p:["Limits convert catastrophic tilt days into small red days","Predefined stops remove in-the-moment negotiation with yourself"],
+  c:["Stopping while 'feeling hot' takes real discipline","Kelly inputs (true win rate/RR) are never known precisely — garbage in, blowup out"],
+  u:"Always. Prop firms enforce these rules because they're what separates professionals from donors.",
+  n:"Never trade to 'win back' a limit breach — that's the exact behavior the limit exists to prevent. Never run full Kelly on estimated parameters.",
+  tip:"Your daily limit is a tripwire for your worst self. The day you most want to ignore it is the day it's saving your account."},
+  quiz:[
+  {q:"After −50%, breakeven requires…",o:["+50%","+100%","+25%","+75%"],a:1,e:"You must double what remains."},
+  {q:"Daily loss limit hit at 1pm. You…",o:["Double size","Stop, journal, return tomorrow","Remove SLs","Switch to gold"],a:1,e:"The limit's whole purpose is firing at this exact moment."},
+  {q:"Full Kelly sizing in live trading is…",o:["Standard practice","Dangerous — inputs are estimates; drawdowns are brutal","Required by brokers","Conservative"],a:1,e:"Pros use fractional Kelly at most; parameter error compounds."}]}
+]},
+{ph:"Phase 9 · Trading Psychology",icon:"🧠",color:"#B08CFF",lessons:[
+ {t:"Fear, Greed, Revenge & Tilt",deep:{
+  w:"The four horsemen: FEAR (cutting winners early, skipping valid setups), GREED (oversizing, overstaying), REVENGE (instant re-entry bigger after a loss), OVERTRADING (boredom trades). Each is a predictable brain response to P&L, not a character flaw.",
+  h:"Counter with mechanics, not willpower: fixed risk% kills greed's lever; a mandatory 15-minute cooldown after any loss kills revenge; a max-trades-per-day rule kills boredom; judging yourself on plan-adherence (not P&L) kills fear.",
+  p:["Naming the pattern in real time ('this urge is revenge') breaks half its power","Rules make discipline automatic instead of heroic"],
+  c:["Knowing ≠ doing — under drawdown the lizard brain runs hot","Rules feel restrictive exactly when emotions say they don't apply"],
+  u:"Build the rules on a GREEN day; obey them on the red ones.",
+  n:"Never make ANY trading decision within minutes of a stop-out. Nothing good is decided at heart-rate 120.",
+  tip:"Loss → hands off the mouse, stand up, water, 15 minutes. This one physical rule is worth more than most courses."},
+  quiz:[
+  {q:"Instantly re-entering bigger after a stop-out is…",o:["Conviction","Revenge trading — the #1 account killer","Scaling in","Hedging"],a:1,e:"Emotion-driven size increase after pain is the classic blowup script."},
+  {q:"The best defense against greed is…",o:["Meditation only","Hard-coded fixed risk per trade","Bigger targets","Hope"],a:1,e:"Remove the lever; the emotion has nothing to pull."},
+  {q:"You should evaluate a trade by…",o:["Its P&L","Whether it followed your written plan","Screenshots likes","Speed"],a:1,e:"Process over outcome — P&L converges to process over 100s of trades."}]},
+ {t:"Routine, Journaling & Burnout",deep:{
+  w:"Elite performance is routine: pre-market prep, defined session, post-market review, real rest. Burnout — from 24/5 markets and revenge-screen-time — degrades decisions long before you notice.",
+  h:"Daily loop: 15-min prep (calendar, HTF levels, bias written down) → trade your window ONLY → 10-min review (journal every trade: setup, emotion, grade A–D on execution). Weekly: read the journal, find your ONE most expensive repeated mistake, design a rule against it.",
+  p:["A journal converts pain into data — your leaks become visible and fixable","Fixed windows protect life, sleep and edge simultaneously"],
+  c:["Journaling feels pointless for weeks before patterns emerge","Routine is boring — which is exactly the point"],
+  u:"From your very first practice trade. Habits install easiest before bad ones exist.",
+  n:"Don't trade when sleep-deprived, sick, angry, or after big life events. 'Flat' is a position — often the most profitable one.",
+  tip:"Review your journal weekly and fix ONE leak at a time. Traders who journal and review outperform not because they know more, but because they repeat less."},
+  quiz:[
+  {q:"The journal's highest-value output is…",o:["Pretty screenshots","Your repeated mistakes, quantified","Broker statements","Tax records"],a:1,e:"Self-generated behavioral data is the rarest edge."},
+  {q:"'Flat is a position' means…",o:["Always be trading","Not trading is a valid, often optimal choice","Only trade flat markets","Hedge everything"],a:1,e:"No setup = no trade. Cash earns while you wait."},
+  {q:"Best time to design discipline rules:",o:["Mid-drawdown at 2am","On a calm green day","During NFP","Never"],a:1,e:"Legislate in peace, execute in war."}]}
+]},
+{ph:"Phase 10 · Strategy Development",icon:"🧪",color:"#4FD8E8",lessons:[
+ {t:"Rules, Backtesting & Curve-Fitting",deep:{
+  w:"A strategy = written IF-THEN rules for setup, entry, stop, target, size, and session. Backtesting replays history against those rules; forward testing runs them live on paper. Curve-fitting = torturing parameters until history confesses — producing a strategy that only ever worked in the past.",
+  h:"Pipeline: write rules → backtest 100+ trades across DIFFERENT regimes (trend/range/news) → check robustness (do nearby parameters also work? MA 48/52 should perform like 50) → forward test 1–3 months → deploy small. Log everything to CSV as you did with your MT5 suite — evidence over vibes.",
+  p:["Rules make results measurable and improvable","Regime-tested strategies survive reality; your XAUUSD MA-crossover survived because trends persisted across regimes"],
+  c:["Past ≠ future; even honest tests decay","Backtests silently flatter you: perfect fills, no spread spikes, no fear"],
+  u:"Before risking one real dollar on ANY idea. No exceptions — the test costs nothing but time.",
+  n:"Never optimize 8 parameters on 30 trades of one calm month — that's memorizing history. Never trust a backtest that ignores spread/slippage on news candles.",
+  tip:"Robustness test: nudge every parameter ±20%. A real edge degrades gracefully; a curve-fit edge falls off a cliff."},
+  quiz:[
+  {q:"Curve-fitting is…",o:["Drawing trendlines","Over-optimizing parameters to fit past data","A chart pattern","Proper testing"],a:1,e:"It memorizes noise instead of learning signal."},
+  {q:"A robust strategy should…",o:["Only work at exactly MA(50)","Perform similarly at nearby parameter values","Need re-optimization weekly","Have 20 parameters"],a:1,e:"Graceful degradation = real edge; cliff = fit."},
+  {q:"Minimum credible sample before risking money:",o:["5 trades","100+ trades across regimes","1 great week","A YouTube video"],a:1,e:"Small samples are luck wearing a costume."}]}
+]},
+{ph:"Phase 11 · Algorithmic Trading",icon:"🤖",color:"#FF9A5C",lessons:[
+ {t:"Python, MT5 API & Automation",deep:{
+  w:"Algo trading encodes your rules in software: Python + the MetaTrader5 package for data/execution, Pine Script for TradingView studies, or MQL5 EAs running natively in the terminal. The machine executes without fear — and without judgment.",
+  h:"Path: (1) automate DATA first — pull candles, compute your setup conditions, log signals to CSV; (2) paper-execute with alerts (Telegram approval gates work well); (3) only then automate real orders with hard-coded risk caps, daily-loss lockouts and a kill switch.",
+  p:["Removes emotion and execution latency entirely","Backtests and live logic share literal code — no translation drift","Runs sessions you sleep through"],
+  c:["Bugs execute at machine speed too — one sign error = instant losses","Over-automation of a bad strategy just loses money efficiently","Infrastructure: VPS, monitoring, reconnect logic"],
+  u:"Automate strategies that ALREADY proved edge manually/in backtests, with mechanical rules (your SMC bot's sweep/CHoCH detection is the right kind of candidate).",
+  n:"Don't automate discretionary judgment you can't write as IF-THEN. If the bot gives zero confirmed signals — as yours did — loosen ONE threshold at a time with logged evidence, never five at once.",
+  tip:"Every live bot needs three guards coded in: max daily loss lockout, max position count, and a heartbeat alert when it's NOT running. Silence is the scariest bug."},
+  quiz:[
+  {q:"The correct first stage of automation is…",o:["Live orders day one","Data + signal logging, no execution","Deleting stops","Renting more leverage"],a:1,e:"Prove the logic on paper trails before it touches money."},
+  {q:"A bot producing zero signals for weeks means…",o:["Markets ended","Thresholds may be too strict — tune ONE variable with logged evidence","Buy more VPS","Randomize entries"],a:1,e:"Evidence-based iterative tuning beats shotgun changes."},
+  {q:"Automation's biggest genuine advantage:",o:["Guaranteed profits","Emotionless, consistent, tireless execution","No testing needed","Free money"],a:1,e:"It executes the plan exactly — which only helps if the plan has edge."}]}
+]},
+{ph:"Phase 12 · Prop Firm Challenges",icon:"🏆",color:"#F5C542",lessons:[
+ {t:"FTMO-Style Rules & How to Pass",deep:{
+  w:"Prop firms rent you capital after an evaluation: typically Phase 1 = +8–10% target, Phase 2 = +5%, with −5% max daily loss and −10% max overall, minimum trading days, sometimes consistency rules. You pay a fee; breach any rule and it's gone.",
+  h:"Passing formula: risk 0.5% per trade, take only A-grade setups (2–4/week), target +0.5–1% weeks, never trade the last hour tilted, treat the daily-loss line as electrified. The target has NO deadline pressure if you avoid the DD lines — time is on your side.",
+  p:["Trade meaningful size without risking your savings","The rules FORCE professional habits — many traders improve just by entering","Scaling plans grow accounts for consistency"],
+  c:["Fees are a real business cost — repeated failed challenges bleed","Daily-DD + spread spikes can kill an account overnight on held positions","Consistency rules can invalidate lucky home-run passes"],
+  u:"Attempt a paid challenge only after your OWN tracked record shows 3+ months of rule-abiding profitability (your journal is the proof).",
+  n:"Never attempt to pass fast with 3–5% risk 'to save time' — the math of daily-DD makes that a lottery ticket, and lottery tickets are what the fee model profits from.",
+  tip:"Run the identical challenge in the Dungeon here until you pass three consecutive runs. Simulated failure is free tuition; real failure is a fee."},
+  quiz:[
+  {q:"Most challenge failures come from breaching…",o:["Profit target","The daily drawdown limit","Minimum days","KYC"],a:1,e:"One oversized tilted day is the classic ending."},
+  {q:"Sound challenge risk-per-trade:",o:["3–5%","0.25–0.75%","10%","All-in on NFP"],a:1,e:"Small risk keeps every day mathematically far from the DD line."},
+  {q:"Best predictor you're READY for a paid challenge:",o:["Confidence","3+ months of your own rule-compliant tracked profitability","A hot week","A big deposit"],a:1,e:"The evaluation just verifies habits you must already have."}]}
+]},
+{ph:"Phase 13 · The Trading Journal",icon:"📓",color:"#2FD180",lessons:[
+ {t:"Journaling as an Edge Engine",deep:{
+  w:"A trading journal records what the broker statement can't: the setup you SAW, the emotion you FELT, the rule you kept or broke. It's the only dataset about your trading that nobody else owns.",
+  h:"Per trade log: date, pair, direction, setup name, planned RR, emotion (calm/fear/greed/revenge/bored), mistakes (early entry, moved SL, oversized, no-setup…), result in R, execution grade A–D. Weekly: 20 minutes reading it, extract the single most expensive repeated mistake, write ONE new rule.",
+  p:["Turns vague 'I keep losing' into 'moved SL cost me 6R this month'","Execution-grading builds identity around process, not P&L swings"],
+  c:["Honest journaling is uncomfortable — the whole point","Consistency lapses exactly when trading goes badly (when it's most needed)"],
+  u:"Every trade including practice ones — this platform's Journal tab is built for exactly this loop.",
+  n:"Don't journal only winners, and don't write novels — 5 structured fields beat 5 paragraphs you'll never re-read.",
+  tip:"Your win rate is decided at review time, not entry time. The weekly 20-minute read is the highest-ROI 'trade' of your week."},
+  quiz:[
+  {q:"The journal field with the most fixing-power is…",o:["Screenshot quality","Repeated mistakes/emotions","Broker name","Font"],a:1,e:"Patterns in mistakes are directly actionable."},
+  {q:"You should grade each trade's…",o:["Profit only","Execution vs plan (A–D)","Luck","Speed"],a:1,e:"Grade the process; outcomes follow the average of grades."},
+  {q:"Weekly review's core output is…",o:["Nostalgia","One new rule targeting your costliest leak","More trades","A bigger watchlist"],a:1,e:"One fixed leak per week compounds shockingly fast."}]}
+]},
+{ph:"Phase 14 · Crypto Trading",icon:"₿",color:"#FF9A5C",lessons:[
+ {t:"Crypto Market Structure & BTC Profile",deep:{
+  w:"Crypto trades 24/7 on centralized exchanges (order books + perpetual futures with funding rates) and on-chain. BTC is the index: alt-coins are high-beta BTC. Perp funding, liquidation cascades, and whale wallets replace central banks as the structural forces.",
+  h:"Apply the same structure/liquidity toolkit — sweeps and order blocks work BETTER in crypto because leverage clustering makes liquidation pools visible. Watch funding (extreme positive = crowded longs = fuel for a flush), weekend liquidity (thin, spiky), and BTC dominance before touching alts.",
+  p:["24/7 access; SMC concepts translate directly","Liquidation maps make liquidity pools nearly explicit","Volatility means real opportunity on small capital"],
+  c:["No circuit breakers, no closing bell — risk never sleeps","Exchange risk is real (hacks, insolvency) — custody matters","Weekend/overnight moves gap through stops"],
+  u:"Trade BTC/ETH majors with the same session discipline as FX (US hours carry volume) and HALF-size until the 24/7 rhythm is familiar.",
+  n:"Don't hold high-leverage perps through weekends; don't trade illiquid alts on SMC logic — micro-caps move on wallets, not structure.",
+  tip:"Funding rate is crypto's sentiment RSI: extreme positive funding + price at highs + equal lows below = the flush setup writes itself."},
+  quiz:[
+  {q:"Perpetual futures funding at extreme positive means…",o:["Shorts crowded","Longs crowded — flush risk grows","Nothing","Exchange closed"],a:1,e:"Longs paying heavily to stay in = one-sided boat."},
+  {q:"Crypto liquidation cascades occur because…",o:["Regulators","Clustered leveraged stops force-market-sell into each other","Mining","Weekends only"],a:1,e:"Forced liquidations chain-react through the order book."},
+  {q:"Compared to FX size, starting crypto size should be…",o:["Bigger","The same","Smaller — 24/7 gap and volatility risk","Irrelevant"],a:2,e:"Volatility + no closing bell = size down."}]}
+]},
+{ph:"Phase 15 · Options Introduction",icon:"🎯",color:"#B08CFF",lessons:[
+ {t:"Calls, Puts & The Greeks",deep:{
+  w:"Options give the RIGHT (not obligation) to buy (call) or sell (put) at a strike before expiry. Price = intrinsic + time value. Greeks measure sensitivities: Delta (direction), Theta (time decay), Vega (volatility), Gamma (delta's acceleration).",
+  h:"As a directional trader: buying options = defined risk (premium) with time working AGAINST you (theta); selling options = income with tail risk. Rule one: never sell naked options while learning. Use options to define risk around events (known max loss through NFP/FOMC).",
+  p:["Buyer's risk is capped at premium — no margin-call surprises","Volatility itself becomes tradable (Vega)","Strategies (spreads) sculpt exact risk shapes"],
+  c:["Theta bleeds buyers daily — right direction, too slow, still lose","Complexity stacks fast; liquidity varies by strike","IV crush after events destroys naive event bets"],
+  u:"Learn on defined-risk spreads in liquid markets; use long options where you want capped risk through binary events.",
+  n:"Never sell naked, never buy short-dated OTM lottery tickets as a 'strategy', never trade options without understanding IV crush.",
+  tip:"Before any event trade, check implied volatility: buying options when IV is already pumped means you can be RIGHT on direction and still lose to the vol crush."},
+  quiz:[
+  {q:"A call option gives the right to…",o:["Sell at strike","Buy at strike","Free shares","Dividends"],a:1,e:"Call = right to buy; put = right to sell."},
+  {q:"Theta measures…",o:["Direction","Daily time decay","Volume","Strike distance"],a:1,e:"Options melt as expiry approaches — buyers pay this rent."},
+  {q:"The absolute beginner rule in options:",o:["Sell naked calls","Never sell naked options","Max leverage","Ignore IV"],a:1,e:"Undefined-risk short options can exceed your account instantly."}]}
+]},
+{ph:"Phase 16 · Portfolio Management",icon:"📦",color:"#4FA8FF",lessons:[
+ {t:"Correlation, Allocation & Rebalancing",deep:{
+  w:"Portfolio thinking treats your trading as ONE book: correlated positions (long EURUSD + long GBPUSD + short DXY) are effectively one big trade. Allocation spreads risk across uncorrelated strategies/instruments; rebalancing restores targets after drift.",
+  h:"Cap total correlated exposure (e.g., max 2% combined risk in USD-theme trades). Run uncorrelated engines side by side: a trend system + a mean-reversion system smooth the equity curve even if each is mediocre alone. Review the book weekly: what's my TRUE net exposure?",
+  p:["Diversification is the only free lunch — same return, less pain","Prevents the 'five trades, one theme' hidden blowup"],
+  c:["Correlations spike toward 1 in crises — exactly when you need them not to","Over-diversification dilutes genuine edge into index-like mush"],
+  u:"The moment you trade more than one pair or one strategy — which is immediately.",
+  n:"Don't 'diversify' into instruments you haven't studied; that's di-worse-ification. Unknown risk isn't spread risk.",
+  tip:"Before adding any trade ask: does my book already own this theme? Three USD-shorts = one 3× USD-short wearing disguises."},
+  quiz:[
+  {q:"Long EURUSD + long GBPUSD + short USDJPY is effectively…",o:["Three independent trades","One large short-USD position","Hedged","Neutral"],a:1,e:"Same theme, one direction — correlation makes it one big bet."},
+  {q:"In market crises, correlations tend to…",o:["Vanish","Spike toward 1","Turn negative","Freeze"],a:1,e:"Everything sells together when liquidity flees."},
+  {q:"Over-diversification risks…",o:["Nothing","Diluting real edge into noise","Fees only","Jail"],a:1,e:"Owning everything = owning the average, minus costs."}]}
+]},
+{ph:"Phase 17 · Business of Trading",icon:"💼",color:"#FF6FB5",lessons:[
+ {t:"Taxes, Scams & Building the Career",deep:{
+  w:"Trading is a business: revenue (edge), costs (spreads, fees, data, taxes), and capital allocation. In India, forex derivatives profits are generally taxed as business income and legal retail forex is limited to exchange-traded INR pairs — offshore broker use carries FEMA/regulatory risk you must research for yourself. Rules differ by country and change; verify with a professional.",
+  h:"Operate like a firm: keep records of every trade/withdrawal, separate trading capital from living money, pay yourself a salary from profits rather than living off the equity curve. Career paths: personal capital compounding, prop-firm scaling, or the skill-adjacent routes (quant/fintech dev — where your firmware+Python profile is genuinely rare).",
+  p:["Records make taxes, prop verification, and self-analysis painless","Business framing kills the lottery mindset"],
+  c:["Regulatory landscape (esp. India + offshore forex) is genuinely complex","Income is lumpy — psychology of no-salary months is underrated"],
+  u:"From day one: records, separation of funds, and awareness of YOUR jurisdiction's rules.",
+  n:"SCAM RADAR — never trust: guaranteed returns, account managers wanting your login, 'deposit matching' brokers, signal sellers with screenshot-only track records, or anyone whose income is your deposit rather than the market.",
+  tip:"If someone could really turn ₹10k into ₹10L monthly, they wouldn't sell that for a ₹999 Telegram subscription. The seller's business model IS the answer to whether it works."},
+  quiz:[
+  {q:"The most reliable scam tell is…",o:["Low fees","Guaranteed returns promises","Regulation","Slow website"],a:1,e:"Markets guarantee nothing; anyone promising otherwise is selling you, not trading."},
+  {q:"Professional money hygiene means…",o:["One account for life+trading","Separated trading capital, records, salary-from-profits","Reinvesting every rupee","Cash only"],a:1,e:"Separation protects both the business and the human."},
+  {q:"Before using offshore forex brokers, an Indian trader should…",o:["Just deposit","Research FEMA/regulatory implications and consult a professional","Ask Telegram","Use a VPN"],a:1,e:"Jurisdiction rules are real and personal — verify, don't assume."}]}
+]}
+];
+
+/* ═══════════ GAMIFICATION ═══════════ */
+const TIERS=[
+ {n:"Bronze Trader",e:"🥉",target:3,dailyDD:8,maxDD:15,minTrades:3,d:"Training vault — generous rules."},
+ {n:"Silver Trader",e:"🥈",target:5,dailyDD:6,maxDD:12,minTrades:4,d:"Rules tighten. Sloppiness starts costing."},
+ {n:"Gold Trader",e:"🥇",target:6,dailyDD:5,maxDD:10,minTrades:5,d:"Standard evaluation conditions."},
+ {n:"Platinum Trader",e:"💠",target:8,dailyDD:5,maxDD:10,minTrades:5,d:"FTMO-style Phase 1. The real exam."},
+ {n:"Diamond Trader",e:"💎",target:5,dailyDD:4,maxDD:8,minTrades:6,d:"Verification phase — patience wins."},
+ {n:"Master Trader",e:"👑",target:10,dailyDD:4,maxDD:8,minTrades:7,d:"Tight lines. One tilted day ends it."},
+ {n:"Funded Hero",e:"🦸",target:10,dailyDD:3,maxDD:6,minTrades:8,d:"Elite discipline territory."},
+ {n:"Institution Slayer",e:"⚡",target:12,dailyDD:3,maxDD:5,minTrades:10,d:"If you clear this, no real challenge will scare you."}];
+const ACH=[
+ {id:"first",n:"First Steps",e:"👣",d:"Complete your first lesson",f:p=>Object.keys(p.lessons||{}).length>=1},
+ {id:"ten",n:"Scholar",e:"📖",d:"Complete 10 lessons",f:p=>Object.keys(p.lessons||{}).length>=10},
+ {id:"grad",n:"Graduate",e:"🎓",d:"Complete every lesson",f:p=>Object.keys(p.lessons||{}).length>=PHASES.reduce((a,x)=>a+x.lessons.length,0)},
+ {id:"s7",n:"Week Warrior",e:"🔥",d:"7-day streak",f:p=>(p.streak||0)>=7},
+ {id:"s30",n:"Iron Discipline",e:"🗿",d:"30-day streak",f:p=>(p.streak||0)>=30},
+ {id:"t50",n:"Reps In",e:"🏋️",d:"50 practice trades",f:p=>(p.tradeCount||0)>=50},
+ {id:"bronze",n:"Vault Cracker",e:"🥉",d:"Clear Bronze tier",f:p=>(p.tier||0)>=1},
+ {id:"plat",n:"Challenge Passer",e:"💠",d:"Clear Platinum tier",f:p=>(p.tier||0)>=4},
+ {id:"slayer",n:"Institution Slayer",e:"⚡",d:"Clear the final tier",f:p=>(p.tier||0)>=8},
+ {id:"j10",n:"Self-Analyst",e:"📓",d:"10 journal entries",f:p=>(p.journal||[]).length>=10},
+ {id:"dc7",n:"Daily Grinder",e:"📅",d:"7 daily challenges done",f:p=>(p.dcCount||0)>=7},
+ {id:"xp1k",n:"XP Machine",e:"⚙️",d:"Reach 1,000 XP",f:p=>(p.xp||0)>=1000}];
+const LVL=xp=>Math.floor(Math.sqrt((xp||0)/25))+1;
+const LVLBASE=l=>((l-1)**2)*25;
+const QPOOL=[];PHASES.forEach((ph,pi)=>ph.lessons.forEach((l,li)=>l.quiz.forEach(q=>QPOOL.push({...q,src:ph.ph}))));
+const CHANNELS=["beginner-help","trade-ideas","technical","fundamental","psychology","crypto"];
+
+/* ═══════════ STATE ═══════════ */
+let S={user:null,tab:"home",view:{},prog:{xp:0,lessons:{},tier:0,streak:0,lastDay:"",journal:[],ach:[],tradeCount:0,dcCount:0,dcDone:""},chatTimer:null};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+const today=()=>new Date().toISOString().slice(0,10);
+
+async function saveProg(){
+  // streak
+  const d=today();
+  if(S.prog.lastDay!==d){
+    const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+    S.prog.streak=(S.prog.lastDay===y)?(S.prog.streak||0)+1:1;
+    S.prog.lastDay=d;
+  }
+  // achievements
+  ACH.forEach(a=>{if(!(S.prog.ach||[]).includes(a.id)&&a.f(S.prog)){S.prog.ach=[...(S.prog.ach||[]),a.id];toast(a.e+" Achievement: "+a.n)}});
+  await kvSet(K.prog(S.user.name),S.prog);
+  // leaderboard entry
+  const b=await kvGet(K.board,{});
+  b[S.user.name]={xp:S.prog.xp||0,tier:S.prog.tier||0,streak:S.prog.streak||0,t:Date.now()};
+  await kvSet(K.board,b);
+}
+function addXP(n){S.prog.xp=(S.prog.xp||0)+n;saveProg()}
+
+/* ═══════════ AUTH ═══════════ */
+async function ensureUsers(){let u=await kvGet(K.users,null);if(!u){u={pavan:{p:btoa("admin@2026"),role:"admin",created:Date.now()}};await kvSet(K.users,u)}return u}
+async function doLogin(){
+  const name=$("lu").value.trim().toLowerCase(),pw=$("lp").value;
+  $("lerr").textContent="";
+  const users=await ensureUsers(),rec=users[name];
+  if(rec&&rec.p===btoa(pw)){
+    S.user={name,role:rec.role||"student"};
+    S.prog=await kvGet(K.prog(name),null)||{xp:0,lessons:{},tier:0,streak:0,lastDay:"",journal:[],ach:[],tradeCount:0,dcCount:0,dcDone:""};
+    S.tab="home";render();
+  } else $("lerr").textContent="Invalid credentials. Access is invite-only — ask your mentor.";
+}
+function logout(){S.user=null;stopSim();if(S.chatTimer)clearInterval(S.chatTimer);render()}
+
+/* ═══════════ CHART (canvas) ═══════════ */
+function drawChart(cvId,candles,upto,pos,trades){
+  const cv=$(cvId);if(!cv)return;
+  const W=cv.clientWidth,H=cv.clientHeight,dpr=window.devicePixelRatio||1;
+  cv.width=W*dpr;cv.height=H*dpr;
+  const x2=cv.getContext("2d");x2.scale(dpr,dpr);
+  x2.fillStyle="#0B1220";x2.fillRect(0,0,W,H);
+  const N=Math.min(90,upto),st=upto-N,view=candles.slice(st,upto);
+  if(!view.length)return;
+  let hi=-1e18,lo=1e18;view.forEach(c=>{hi=Math.max(hi,c.h);lo=Math.min(lo,c.l)});
+  if(pos){[pos.entry,pos.sl,pos.tp].forEach(v=>{if(v){hi=Math.max(hi,v);lo=Math.min(lo,v)}})}
+  const pad=(hi-lo)*.08||1;hi+=pad;lo-=pad;
+  const Y=p=>H-(p-lo)/(hi-lo)*H,cw=W/N;
+  x2.strokeStyle="#1A2438";for(let i=1;i<5;i++){x2.beginPath();x2.moveTo(0,H/5*i);x2.lineTo(W,H/5*i);x2.stroke()}
+  x2.fillStyle="#5A6A8A";x2.font="10px ui-monospace,monospace";
+  for(let i=0;i<=5;i++){const p=lo+(hi-lo)/5*i;x2.fillText(fx(p),4,Y(p)-3)}
+  view.forEach((c,i)=>{const x=i*cw+cw/2,up=c.c>=c.o,col=up?"#2FD180":"#FF5C5C";
+    x2.strokeStyle=col;x2.fillStyle=col;x2.lineWidth=Math.max(1,cw*.12);
+    x2.beginPath();x2.moveTo(x,Y(c.h));x2.lineTo(x,Y(c.l));x2.stroke();
+    const bw=Math.max(2,cw*.6),t=Y(Math.max(c.o,c.c)),b=Y(Math.min(c.o,c.c));
+    x2.fillRect(x-bw/2,t,bw,Math.max(1,b-t))});
+  if(pos){const ln=(p,col,lab)=>{if(!p)return;x2.strokeStyle=col;x2.setLineDash([5,4]);x2.lineWidth=1;
+    x2.beginPath();x2.moveTo(0,Y(p));x2.lineTo(W,Y(p));x2.stroke();x2.setLineDash([]);
+    x2.fillStyle=col;x2.font="10px ui-monospace,monospace";x2.fillText(lab+" "+fx(p),W-110,Y(p)-4)};
+    ln(pos.entry,"#F5C542",pos.dir>0?"BUY":"SELL");ln(pos.sl,"#FF5C5C","SL");ln(pos.tp,"#2FD180","TP")}
+  (trades||[]).forEach(t=>{if(t.i<st||t.i>=upto)return;const x=(t.i-st)*cw+cw/2;
+    x2.fillStyle=t.pnl>=0?"#2FD180":"#FF5C5C";x2.font="12px sans-serif";x2.fillText(t.pnl>=0?"✔":"✖",x-5,14)});
+  const la=view[view.length-1];x2.fillStyle=la.c>=la.o?"#2FD180":"#FF5C5C";
+  x2.fillRect(W-64,Y(la.c)-9,62,16);x2.fillStyle="#0B1220";x2.font="bold 10px ui-monospace,monospace";x2.fillText(fx(la.c),W-60,Y(la.c)+3);
+}
+
+/* ═══════════ TRADE ENGINE ═══════════ */
+let sim=null,simTimer=null;
+function newSim(symbol,rules){
+  stopSim();
+  sim={symbol,rules,candles:gen(symbol,700,Math.floor(Math.random()*1e9)),idx:120,playing:false,speed:1,
+       bal:10000,pos:null,hist:[],status:"active",fail:"",dayEq:10000,startBal:10000,cvId:rules?"dgcv":"prcv"};
+  return sim;
+}
+function stopSim(){if(simTimer){clearInterval(simTimer);simTimer=null}if(sim)sim.playing=false}
+const simPrice=()=>sim.candles[Math.min(sim.idx,sim.candles.length)-1].c;
+const simEq=()=>sim.bal+(sim.pos?(simPrice()-sim.pos.entry)*sim.pos.dir*sim.pos.lots*SYM[sim.symbol].ct:0);
+function simStep(){
+  if(!sim||sim.status!=="active")return;
+  if(sim.idx>=sim.candles.length){sim.playing=false;stopSim();updateSimUI();return}
+  const c=sim.candles[sim.idx],sp=SYM[sim.symbol];
+  if(sim.pos){let ex=null;const p=sim.pos;
+    if(p.dir>0){if(p.sl&&c.l<=p.sl)ex=p.sl;else if(p.tp&&c.h>=p.tp)ex=p.tp}
+    else{if(p.sl&&c.h>=p.sl)ex=p.sl;else if(p.tp&&c.l<=p.tp)ex=p.tp}
+    if(ex!==null){const pnl=(ex-p.entry)*p.dir*p.lots*sp.ct;sim.bal+=pnl;
+      sim.hist.push({i:sim.idx,dir:p.dir,pnl,entry:p.entry,exit:ex,lots:p.lots,sl:p.sl,openIdx:p.i});sim.pos=null;
+      S.prog.tradeCount=(S.prog.tradeCount||0)+1}}
+  sim.idx++;
+  if(sim.rules){
+    if(sim.idx%96===0)sim.dayEq=simEq();
+    const eq=simEq(),r=sim.rules,sb=sim.startBal;
+    const dd=(sim.dayEq-eq)/sb*100,tdd=(sb-eq)/sb*100,pf=(eq-sb)/sb*100;
+    if(dd>=r.dailyDD){sim.status="failed";sim.fail="Daily drawdown breached (−"+r.dailyDD+"%)";sim.pos=null;stopSim()}
+    else if(tdd>=r.maxDD){sim.status="failed";sim.fail="Max drawdown breached (−"+r.maxDD+"%)";sim.pos=null;stopSim()}
+    else if(pf>=r.target&&sim.hist.length>=r.minTrades){sim.status="passed";stopSim()}
+  }
+  updateSimUI();
+}
+function simPlay(){if(!sim)return;sim.playing=!sim.playing;
+  if(simTimer){clearInterval(simTimer);simTimer=null}
+  if(sim.playing)simTimer=setInterval(simStep,Math.max(60,700/sim.speed));
+  updateSimUI()}
+function simSpeed(s){sim.speed=s;if(sim.playing){clearInterval(simTimer);simTimer=setInterval(simStep,Math.max(60,700/s))}updateSimUI()}
+function simOpen(dir){
+  if(!sim||sim.pos||sim.status!=="active")return;
+  const lots=parseFloat($("tlots").value)||.1,slp=parseFloat($("tsl").value)||0,tpp=parseFloat($("ttp").value)||0;
+  const sp=SYM[sim.symbol],u=sp.dg>=4?.0001:sp.base*.0004,pr=simPrice();
+  sim.pos={dir,lots,entry:pr,sl:slp?pr-dir*slp*u:null,tp:tpp?pr+dir*tpp*u:null,i:sim.idx};updateSimUI()}
+function simClose(){if(!sim||!sim.pos)return;const sp=SYM[sim.symbol],pr=simPrice(),p=sim.pos;
+  const pnl=(pr-p.entry)*p.dir*p.lots*sp.ct;sim.bal+=pnl;
+  sim.hist.push({i:sim.idx,dir:p.dir,pnl,entry:p.entry,exit:pr,lots:p.lots,sl:p.sl,openIdx:p.i});sim.pos=null;
+  S.prog.tradeCount=(S.prog.tradeCount||0)+1;updateSimUI()}
+
+/* ═══════════ COACH — rule-based session analysis ═══════════ */
+function coachReport(h,startBal,candlesUsed){
+  if(!h.length)return["No closed trades this session. Screen time without reps teaches nothing — take small positions and generate data to review."];
+  const out=[],wins=h.filter(t=>t.pnl>0),losses=h.filter(t=>t.pnl<=0);
+  const wr=wins.length/h.length*100;
+  const gw=wins.reduce((a,t)=>a+t.pnl,0),gl=Math.abs(losses.reduce((a,t)=>a+t.pnl,0));
+  const pf=gl?gw/gl:Infinity;
+  const aw=wins.length?gw/wins.length:0,al=losses.length?gl/losses.length:0;
+  const net=gw-gl;
+  out.push(`📊 ${h.length} trades · ${wr.toFixed(0)}% win rate · profit factor ${pf===Infinity?"∞":pf.toFixed(2)} · net ${net>=0?"+":""}$${net.toFixed(2)}`);
+  if(al>0&&aw/al<0.8&&wr<65)out.push("⚠️ Your average loss ($"+al.toFixed(0)+") outweighs your average win ($"+aw.toFixed(0)+"). Classic sign of cutting winners early and letting losers breathe. Aim for at least 1:1.5 realized RR.");
+  if(aw/Math.max(al,1)>=1.5)out.push("✅ Healthy reward:risk — winners meaningfully larger than losers. This is the shape of a survivable system.");
+  const noSL=h.filter(t=>!t.sl).length;
+  if(noSL)out.push(`🚨 ${noSL} trade(s) had NO stop loss. In a funded challenge one such trade through news ends everything. Non-negotiable fix.`);
+  // revenge: bigger lots right after a loss
+  let rev=0;for(let i=1;i<h.length;i++)if(h[i-1].pnl<0&&h[i].lots>h[i-1].lots*1.5)rev++;
+  if(rev)out.push(`🔥 Detected ${rev} size-up(s) immediately after a loss — the revenge-trading fingerprint. Rule: after any loss, next trade same size or smaller, after a 15-min pause.`);
+  // overtrading
+  const dens=h.length/Math.max(1,candlesUsed/96);
+  if(dens>8)out.push(`⏳ ${dens.toFixed(0)} trades per simulated day is overtrading. A-grade setups are rare by definition; quantity is where edges go to die.`);
+  // quick flips
+  let scal=0;h.forEach(t=>{if(t.openIdx!==undefined&&t.i-t.openIdx<=2)scal++});
+  if(scal>h.length/2)out.push("⚡ Most positions closed within 1–2 candles. If that's a plan, fine — if it's anxiety, your journal's 'emotion' column will tell you.");
+  if(wr>=55&&pf>=1.5)out.push("🏆 Strong session. Now: could you repeat it with the same rules 20 more times? Consistency IS the strategy.");
+  if(wr<35&&pf<1)out.push("🧭 Rough session — good. Cheap lessons. Review each entry: was there a sweep/structure reason, or just movement? Mark each trade A–D in the journal.");
+  return out;
+}
+
+/* ═══════════ VIEWS ═══════════ */
+function vLogin(){return `
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(1200px 600px at 50% -10%,#14213B 0%,#0B1220 60%)">
+ <div style="width:100%;max-width:380px">
+  <div style="text-align:center;margin-bottom:26px">
+   <div class="tag gold" style="letter-spacing:4px">FOREX LEARNING OPERATING SYSTEM</div>
+   <h1 style="font-size:36px;font-weight:900;letter-spacing:-1px;margin-top:6px">FX-<span class="gold">OS</span></h1>
+   <p class="dim" style="font-size:13px;margin-top:6px">Learn · Practice · Journal · Get Funded</p>
+  </div>
+  <div class="card" style="padding:22px">
+   <label class="dim" style="font-size:12px">Username</label>
+   <input id="lu" class="inp" style="margin:6px 0 14px" placeholder="your username" autocapitalize="none">
+   <label class="dim" style="font-size:12px">Password</label>
+   <input id="lp" class="inp" type="password" style="margin:6px 0 16px" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+   <div id="lerr" class="bear" style="font-size:13px;margin-bottom:10px"></div>
+   <button class="btn" style="width:100%" onclick="doLogin()">Enter the floor</button>
+   <p style="color:#5A6A8A;font-size:11px;margin-top:14px;text-align:center">Invite-only. Accounts are created by the mentor.${remote()?"":" · Running in local demo mode"}</p>
+  </div>
+ </div></div>`}
+
+function vHome(){
+  const p=S.prog,lv=LVL(p.xp),nxt=LVLBASE(lv+1),cur=LVLBASE(lv);
+  const total=PHASES.reduce((a,x)=>a+x.lessons.length,0),done=Object.keys(p.lessons||{}).length;
+  const dcDone=p.dcDone===today();
+  return `<div class="wrap">
+  <h2>Welcome back, ${esc(S.user.name)} ${S.user.name==="pavan"?"👑":""}</h2>
+  <p class="sub">Level ${lv} · ${p.xp||0} XP · ${done}/${total} lessons</p>
+  <div class="prog" style="margin-bottom:14px"><div style="width:${((p.xp-cur)/(nxt-cur)*100).toFixed(0)}%"></div></div>
+  <div class="grid3" style="margin-bottom:14px">
+   <div class="stat"><b class="gold">🔥 ${p.streak||0}</b><span>day streak</span></div>
+   <div class="stat"><b>${TIERS[Math.min(p.tier||0,7)].e} ${p.tier||0}/8</b><span>dungeon tier</span></div>
+   <div class="stat"><b>${(p.ach||[]).length}/${ACH.length}</b><span>achievements</span></div>
+  </div>
+  <div class="card" style="border-color:${dcDone?"var(--line)":"var(--gold)"};margin-bottom:14px">
+   <div class="row" style="justify-content:space-between">
+    <div><b>📅 Daily Challenge</b><div class="dim" style="font-size:12px">5 rapid-fire questions · +25 XP</div></div>
+    ${dcDone?'<span class="pill bull">✓ done today</span>':'<button class="btn" style="padding:9px 14px" onclick="startDC()">Start</button>'}
+   </div></div>
+  <div class="card" style="margin-bottom:14px"><b>🏅 Achievements</b>
+   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+   ${ACH.map(a=>`<span class="pill" style="${(p.ach||[]).includes(a.id)?"border-color:var(--gold);color:var(--gold)":"opacity:.45"}" title="${esc(a.d)}">${a.e} ${a.n}</span>`).join("")}
+   </div></div>
+  <div class="card"><b>🏆 Leaderboard</b><div id="board" class="dim" style="font-size:13px;margin-top:8px">Loading…</div></div>
+ </div>`}
+async function loadBoard(){
+  const b=await kvGet(K.board,{}),el=$("board");if(!el)return;
+  const rows=Object.entries(b).sort((a,c)=>c[1].xp-a[1].xp).slice(0,10);
+  el.innerHTML=rows.length?rows.map(([n,r],i)=>`<div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)">
+   <span>${["🥇","🥈","🥉"][i]||(i+1)+"."} <b>${esc(n)}</b>${n==="pavan"?" 👑":""}</span>
+   <span class="mono" style="font-size:12px">${r.xp} XP · 🔥${r.streak||0} · tier ${r.tier||0}</span></div>`).join("")
+   +(remote()?"":'<div style="font-size:11px;margin-top:8px;color:#5A6A8A">Local mode — connect Supabase to compete globally.</div>')
+  :"No entries yet.";
+}
+
+/* ---- Academy ---- */
+function vAcademy(){
+  const done=S.prog.lessons||{};let unlocked=true;
+  return `<div class="wrap"><h2>The Academy</h2><p class="sub">${PHASES.length} phases · beginner → funded. Finish a lesson to unlock the next.</p>
+  ${PHASES.map((ph,pi)=>`<div style="margin-bottom:20px">
+   <div class="row" style="margin-bottom:10px"><span style="font-size:19px">${ph.icon}</span>
+    <b style="color:${ph.color}">${ph.ph}</b><span style="flex:1;height:1px;background:var(--line)"></span></div>
+   <div style="display:grid;gap:10px">
+   ${ph.lessons.map((l,li)=>{
+     const key=pi+":"+li,ok=!!done[key],un=unlocked;if(!ok)unlocked=false;
+     return `<button class="lesson-node" style="opacity:${un?1:.45};border-color:${ok?ph.color:"var(--line)"}" ${un?`onclick="openLesson(${pi},${li})"`:"disabled"}>
+      <div class="badge" style="${ok?`background:${ph.color};color:#0B1220;border-color:${ph.color}`:un?`border-color:${ph.color}`:""}">${ok?"✓":un?"▶":"🔒"}</div>
+      <div><div style="font-weight:700">${esc(l.t)}</div>
+      <div class="dim" style="font-size:12px">Deep lesson · ${l.quiz.length} questions · +${15+l.quiz.length*5} XP</div></div></button>`}).join("")}
+   </div></div>`).join("")}</div>`}
+
+let L={};
+function openLesson(pi,li){L={pi,li,step:0,picked:null,score:0,mode:"read"};S.tab="lesson";render()}
+function vLesson(){
+  const ph=PHASES[L.pi],l=ph.lessons[L.li],d=l.deep;
+  if(L.mode==="read")return `<div class="wrap deep">
+   <div class="row" style="margin-bottom:14px"><button class="ghost" style="padding:6px 12px" onclick="S.tab='academy';render()">✕</button>
+    <div class="tag" style="color:${ph.color}">${ph.ph.toUpperCase()}</div></div>
+   <h2 style="line-height:1.2">${esc(l.t)}</h2>
+   <h4 style="color:${ph.color}">WHAT IT IS</h4><p>${esc(d.w)}</p>
+   <h4 style="color:${ph.color}">HOW TO USE IT</h4><p>${esc(d.h)}</p>
+   <div class="grid2" style="margin-top:14px">
+    <div class="card" style="border-color:#1E4634"><h4 class="bull" style="margin-top:0">ADVANTAGES</h4><ul>${d.p.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+    <div class="card" style="border-color:#4A2430"><h4 class="bear" style="margin-top:0">LIMITATIONS</h4><ul>${d.c.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+   </div>
+   <h4 class="bull">WHEN TO USE</h4><p>${esc(d.u)}</p>
+   <h4 class="bear">WHEN NOT TO USE</h4><p>${esc(d.n)}</p>
+   <div class="card" style="border-color:var(--gold);margin-top:16px"><h4 class="gold" style="margin-top:0">💡 PRO TIP</h4><p>${esc(d.tip)}</p></div>
+   <button class="btn" style="width:100%;margin-top:18px" onclick="L.mode='quiz';L.step=0;render()">Take the quiz →</button></div>`;
+  if(L.mode==="done")return `<div class="wrap" style="text-align:center">
+   <div style="font-size:56px;margin:40px 0 10px">🏅</div><h2>Lesson complete!</h2>
+   <p class="dim" style="margin-top:8px">${L.score}/${l.quiz.length} correct · +${15+L.score*5} XP</p>
+   <button class="btn" style="width:100%;margin-top:24px" onclick="finishLesson()">Claim XP</button></div>`;
+  const q=l.quiz[L.step];
+  return `<div class="wrap">
+   <div class="row" style="margin-bottom:14px"><button class="ghost" style="padding:6px 12px" onclick="S.tab='academy';render()">✕</button>
+    <div class="prog" style="flex:1"><div style="width:${L.step/l.quiz.length*100}%;background:${ph.color}"></div></div></div>
+   <div class="tag" style="color:${ph.color};margin-bottom:8px">QUESTION ${L.step+1}/${l.quiz.length}</div>
+   <h2 style="font-size:19px;line-height:1.35">${esc(q.q)}</h2>
+   <div style="display:grid;gap:10px;margin-top:16px">
+   ${q.o.map((o,i)=>{let cl="opt";if(L.picked!==null){if(i===q.a)cl+=" ok";else if(i===L.picked)cl+=" bad"}
+    return `<button class="${cl}" ${L.picked===null?`onclick="pick(${i})"`:"disabled"}>${esc(o)}</button>`}).join("")}
+   </div>
+   ${L.picked!==null?`<div class="card" style="margin-top:14px;border-color:${L.picked===q.a?"var(--bull)":"var(--bear)"}">
+    <b class="${L.picked===q.a?"bull":"bear"}">${L.picked===q.a?"Correct! +5 XP":"Not quite."}</b>
+    <p style="font-size:13.5px;color:#C4CFE4;margin-top:6px;line-height:1.5">${esc(q.e)}</p>
+    <button class="btn" style="width:100%;margin-top:12px" onclick="nextQ()">Continue</button></div>`:""}
+  </div>`}
+function pick(i){const q=PHASES[L.pi].lessons[L.li].quiz[L.step];L.picked=i;if(i===q.a)L.score++;render()}
+function nextQ(){L.picked=null;L.step++;if(L.step>=PHASES[L.pi].lessons[L.li].quiz.length)L.mode="done";render()}
+function finishLesson(){S.prog.lessons={...(S.prog.lessons||{}),[L.pi+":"+L.li]:true};addXP(15+L.score*5);S.tab="academy";render()}
+
+/* ---- Daily Challenge ---- */
+let DC={};
+function startDC(){
+  const seed=parseInt(today().replace(/-/g,""),10),r=rng(seed),qs=[];const used=new Set();
+  while(qs.length<5){const i=Math.floor(r()*QPOOL.length);if(!used.has(i)){used.add(i);qs.push(QPOOL[i])}}
+  DC={qs,step:0,picked:null,score:0};S.tab="dc";render();
+}
+function vDC(){
+  if(DC.step>=5)return `<div class="wrap" style="text-align:center"><div style="font-size:56px;margin:40px 0 10px">📅</div>
+   <h2>Daily Challenge done!</h2><p class="dim" style="margin-top:8px">${DC.score}/5 correct · +25 XP · streak protected 🔥</p>
+   <button class="btn" style="width:100%;margin-top:24px" onclick="S.prog.dcDone=today();S.prog.dcCount=(S.prog.dcCount||0)+1;addXP(25);S.tab='home';render()">Claim</button></div>`;
+  const q=DC.qs[DC.step];
+  return `<div class="wrap">
+   <div class="row" style="margin-bottom:14px"><button class="ghost" style="padding:6px 12px" onclick="S.tab='home';render()">✕</button>
+   <div class="prog" style="flex:1"><div style="width:${DC.step/5*100}%"></div></div></div>
+   <div class="tag gold" style="margin-bottom:6px">DAILY CHALLENGE ${DC.step+1}/5 · ${esc(q.src)}</div>
+   <h2 style="font-size:19px;line-height:1.35">${esc(q.q)}</h2>
+   <div style="display:grid;gap:10px;margin-top:16px">
+   ${q.o.map((o,i)=>{let cl="opt";if(DC.picked!==null){if(i===q.a)cl+=" ok";else if(i===DC.picked)cl+=" bad"}
+    return `<button class="${cl}" ${DC.picked===null?`onclick="DC.picked=${i};if(${i}===${q.a})DC.score++;render()"`:"disabled"}>${esc(o)}</button>`}).join("")}</div>
+   ${DC.picked!==null?`<div class="card" style="margin-top:14px"><p style="font-size:13.5px;color:#C4CFE4">${esc(q.e)}</p>
+    <button class="btn" style="width:100%;margin-top:12px" onclick="DC.picked=null;DC.step++;render()">Continue</button></div>`:""}</div>`}
+
+/* ---- Practice ---- */
+function vPractice(){
+  if(!sim||sim.rules)newSim("XAUUSD",null);
+  return `<div class="wrap"><h2>Practice Arena</h2>
+  <p class="sub">Historical-style replay — the future is hidden. $10,000 paper account. End the session for coach feedback.</p>
+  <div class="row" style="overflow-x:auto;padding-bottom:6px;margin-bottom:10px">
+   ${Object.keys(SYM).map(s=>`<button class="ghost mono ${sim.symbol===s?"on":""}" style="padding:8px 12px;font-size:12px;flex-shrink:0" onclick="newSim('${s}');render()">${s}</button>`).join("")}
+  </div>
+  ${simShell("prcv")}
+  <button class="ghost" style="width:100%;margin-top:12px;color:var(--gold);border-color:var(--gold)" onclick="endSession()">🎓 End session & get coach feedback</button>
+  <div id="coach"></div>
+  <button class="ghost" style="width:100%;margin-top:10px" onclick="newSim(sim.symbol);render()">↺ New random session</button></div>`}
+function endSession(){
+  const rep=coachReport(sim.hist,sim.startBal,sim.idx-120);
+  $("coach").innerHTML=`<div class="card" style="margin-top:12px;border-color:var(--gold)"><b class="gold">🤖 Coach Review</b>
+  ${rep.map(r=>`<p style="font-size:13.5px;line-height:1.55;color:#C4CFE4;margin-top:10px">${esc(r)}</p>`).join("")}
+  <p style="font-size:12px;color:#5A6A8A;margin-top:12px">Log this session in your Journal while it's fresh — emotion included.</p></div>`;
+  saveProg();
+}
+function simShell(cvId){
+  sim.cvId=cvId;
+  return `<div style="border:1px solid var(--line);border-radius:12px;overflow:hidden"><canvas id="${cvId}" style="width:100%;height:300px;display:block"></canvas></div>
+  <div class="row" style="margin-top:10px">
+   <button class="btn" style="padding:10px 16px" onclick="simPlay()">${sim.playing?"⏸":"▶"}</button>
+   <button class="ghost" onclick="simStep()">Step ›</button>
+   <div class="row" style="margin-left:auto">${[1,3,10].map(s=>`<button class="ghost ${sim.speed===s?"on":""}" style="padding:8px 10px;font-size:12px" onclick="simSpeed(${s})">${s}×</button>`).join("")}</div>
+  </div>
+  <div class="card" style="margin-top:12px" id="tpanel">${tPanel()}</div>`}
+function tPanel(){
+  const sp=SYM[sim.symbol],eq=simEq(),up=sim.pos?(simPrice()-sim.pos.entry)*sim.pos.dir*sim.pos.lots*sp.ct:0;
+  const vLots=$("tlots")?$("tlots").value:"0.10", vSl=$("tsl")?$("tsl").value:"30", vTp=$("ttp")?$("ttp").value:"60";
+  return `<div class="row" style="justify-content:space-between;margin-bottom:10px">
+   <span class="mono" style="font-size:13px"><span class="dim">Bal </span><b>$${sim.bal.toFixed(2)}</b></span>
+   <span class="mono" style="font-size:13px"><span class="dim">Eq </span><b class="${eq>=sim.bal?"bull":"bear"}">$${eq.toFixed(2)}</b></span></div>
+  ${sim.pos?`<div class="mono" style="font-size:13px;margin-bottom:10px">${sim.pos.dir>0?"LONG":"SHORT"} ${sim.pos.lots} @ ${fx(sim.pos.entry)} ·
+    <b class="${up>=0?"bull":"bear"}">${up>=0?"+":""}${up.toFixed(2)}$</b></div>
+   <button class="btn" style="width:100%;background:#2A3552;color:var(--text)" onclick="simClose()">Close position</button>`
+  :`<div class="grid3" style="margin-bottom:10px">
+    <div><label class="dim" style="font-size:10px">Lots</label><input id="tlots" class="inp mono" style="padding:8px 10px;font-size:13px" value="${vLots}" inputmode="decimal"></div>
+    <div><label class="dim" style="font-size:10px">SL (pips)</label><input id="tsl" class="inp mono" style="padding:8px 10px;font-size:13px" value="${vSl}" inputmode="decimal"></div>
+    <div><label class="dim" style="font-size:10px">TP (pips)</label><input id="ttp" class="inp mono" style="padding:8px 10px;font-size:13px" value="${vTp}" inputmode="decimal"></div></div>
+   <div class="grid2"><button class="btn buy" onclick="simOpen(1)">BUY ▲</button><button class="btn sell" onclick="simOpen(-1)">SELL ▼</button></div>`}
+  ${sim.hist.length?`<div style="margin-top:12px;border-top:1px solid var(--line);padding-top:8px;max-height:110px;overflow-y:auto">
+   ${sim.hist.slice().reverse().map(t=>`<div class="mono row" style="justify-content:space-between;font-size:12px;padding:3px 0">
+    <span class="dim">${t.dir>0?"BUY":"SELL"} ${fx(t.entry)} → ${fx(t.exit)}</span>
+    <b class="${t.pnl>=0?"bull":"bear"}">${t.pnl>=0?"+":""}${t.pnl.toFixed(2)}</b></div>`).join("")}</div>`:""}`}
+function updateSimUI(){
+  if(!sim)return;
+  drawChart(sim.cvId,sim.candles,sim.idx,sim.pos,sim.hist);
+  const tp=$("tpanel");if(tp&&!document.activeElement?.classList?.contains("inp"))tp.innerHTML=tPanel();
+  const hd=$("dghead");if(hd&&sim.rules)hd.innerHTML=dgHead();
+  if(sim.rules&&sim.status!=="active"){render()}
+}
+
+/* ---- Dungeon ---- */
+function vDungeon(){
+  if(S.view.tier===undefined)return `<div class="wrap"><h2>⚔️ The Funded Dungeon</h2>
+  <p class="sub">Eight tiers of prop-firm evaluation on a $10,000 sim account. Rules tighten every level. Every failure here saves you a real challenge fee.</p>
+  <div style="display:grid;gap:12px">
+  ${TIERS.map((t,i)=>{const un=i<=(S.prog.tier||0),cl=i<(S.prog.tier||0);
+   return `<button class="card" style="text-align:left;opacity:${un?1:.4};border-color:${cl?"var(--gold)":"var(--line)"}" ${un?`onclick="S.view.tier=${i};newSim('XAUUSD',TIERS[${i}]);render()"`:"disabled"}>
+    <div class="row" style="justify-content:space-between"><b>${cl?"👑":un?"🗝️":"🔒"} ${t.e} ${t.n}</b>${cl?'<span class="tag gold">CLEARED</span>':""}</div>
+    <div class="dim" style="font-size:12.5px;margin:6px 0 8px">${t.d}</div>
+    <div class="mono" style="font-size:11px;color:#7E8BA6">Target +${t.target}% · Daily DD −${t.dailyDD}% · Max DD −${t.maxDD}% · Min ${t.minTrades} trades</div></button>`}).join("")}
+  </div></div>`;
+  const t=TIERS[S.view.tier];
+  return `<div class="wrap">
+   <div class="row" style="justify-content:space-between;margin-bottom:10px">
+    <button class="ghost" style="padding:6px 12px" onclick="delete S.view.tier;stopSim();sim=null;render()">‹ Exit</button>
+    <b>${t.e} ${t.n}</b><span class="mono dim" style="font-size:11px">XAUUSD</span></div>
+   <div id="dghead">${dgHead()}</div>
+   ${sim.status==="passed"?`<div class="card" style="border-color:var(--gold);text-align:center;margin-bottom:12px">
+    <div style="font-size:40px">👑</div><b class="gold" style="font-size:18px">TIER CLEARED</b>
+    <p class="dim" style="font-size:13px;margin:6px 0 12px">+${t.target}% with discipline intact. +75 XP.</p>
+    <button class="btn" style="width:100%" onclick="S.prog.tier=Math.max(S.prog.tier||0,S.view.tier+1);addXP(75);delete S.view.tier;sim=null;render()">Descend deeper</button></div>`:""}
+   ${sim.status==="failed"?`<div class="card" style="border-color:var(--bear);text-align:center;margin-bottom:12px">
+    <div style="font-size:40px">💀</div><b class="bear" style="font-size:18px">CHALLENGE FAILED</b>
+    <p class="dim" style="font-size:13px;margin:6px 0 12px">${esc(sim.fail)}. Journal what happened — that's the tuition.</p>
+    <button class="btn" style="width:100%" onclick="newSim('XAUUSD',TIERS[S.view.tier]);render()">↺ Retry tier</button></div>`:""}
+   ${simShell("dgcv")}</div>`}
+function dgHead(){
+  const t=sim.rules,pf=(simEq()-sim.startBal)/sim.startBal*100;
+  return `<div class="grid3" style="margin-bottom:12px">
+   <div class="stat"><b class="${pf>=0?"bull":"bear"}">${pf.toFixed(2)}%</b><span>of +${t.target}% target</span></div>
+   <div class="stat"><b>${sim.hist.length}</b><span>trades · min ${t.minTrades}</span></div>
+   <div class="stat"><b class="gold">−${t.dailyDD}/−${t.maxDD}%</b><span>daily / max DD</span></div></div>`}
+
+/* ---- Journal ---- */
+const EMO=["calm","confident","fearful","greedy","revenge","bored"];
+const MIS=["chased entry","moved SL","no SL","oversized","early exit","no setup","news gamble","overtraded"];
+function vJournal(){
+  const j=S.prog.journal||[];
+  const wk=j.filter(e=>Date.now()-e.ts<7*864e5);
+  const wins=wk.filter(e=>e.res==="win").length;
+  const mc={};wk.forEach(e=>(e.mis||[]).forEach(m=>mc[m]=(mc[m]||0)+1));
+  const topMis=Object.entries(mc).sort((a,b)=>b[1]-a[1])[0];
+  return `<div class="wrap"><h2>📓 Trading Journal</h2><p class="sub">Log every trade — practice included. Your mistakes are your edge, once counted.</p>
+  <div class="card" style="margin-bottom:14px"><b>New entry</b>
+   <div class="grid3" style="margin:10px 0">
+    <input id="jpair" class="inp" style="padding:9px" placeholder="Pair" value="XAUUSD">
+    <select id="jdir" class="inp" style="padding:9px"><option>long</option><option>short</option></select>
+    <select id="jres" class="inp" style="padding:9px"><option>win</option><option>loss</option><option>breakeven</option></select></div>
+   <div class="grid2" style="margin-bottom:10px">
+    <select id="jemo" class="inp" style="padding:9px">${EMO.map(e=>`<option>${e}</option>`).join("")}</select>
+    <select id="jgrade" class="inp" style="padding:9px"><option>A — followed plan</option><option>B — minor deviation</option><option>C — broke a rule</option><option>D — no plan at all</option></select></div>
+   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="jmis">
+    ${MIS.map(m=>`<button class="chan" data-m="${m}" onclick="this.classList.toggle('on')">${m}</button>`).join("")}</div>
+   <textarea id="jnote" class="inp" style="min-height:70px" placeholder="What did you see? What was the plan? What actually happened?"></textarea>
+   <button class="btn" style="width:100%;margin-top:10px" onclick="addJ()">Save entry (+5 XP)</button></div>
+  <div class="card" style="margin-bottom:14px;border-color:var(--gold)"><b class="gold">📈 Weekly review</b>
+   <p style="font-size:13.5px;color:#C4CFE4;margin-top:8px">${wk.length?`${wk.length} entries · ${wins} wins (${(wins/wk.length*100).toFixed(0)}%)${topMis?` · most repeated mistake: <b>${esc(topMis[0])}</b> ×${topMis[1]} — write one rule against it this week.`:" · no repeated mistakes logged. Either flawless… or under-logging."}`:"No entries in the last 7 days. The review can only be as honest as the log."}</p></div>
+  ${j.slice().reverse().map(e=>`<div class="card" style="margin-bottom:10px">
+   <div class="row" style="justify-content:space-between"><b>${esc(e.pair)} ${e.dir==="long"?"▲":"▼"} <span class="${e.res==="win"?"bull":e.res==="loss"?"bear":"dim"}">${e.res}</span></b>
+   <span class="mono dim" style="font-size:11px">${new Date(e.ts).toLocaleDateString()}</span></div>
+   <div style="font-size:12px;margin-top:5px"><span class="pill">${esc(e.emo)}</span> <span class="pill">${esc(e.grade)}</span> ${(e.mis||[]).map(m=>`<span class="pill" style="color:var(--bear);border-color:#4A2430">${esc(m)}</span>`).join(" ")}</div>
+   ${e.note?`<p style="font-size:13px;color:#C4CFE4;margin-top:8px">${esc(e.note)}</p>`:""}</div>`).join("")}</div>`}
+function addJ(){
+  const mis=[...document.querySelectorAll("#jmis .chan.on")].map(b=>b.dataset.m);
+  S.prog.journal=[...(S.prog.journal||[]),{ts:Date.now(),pair:$("jpair").value,dir:$("jdir").value,res:$("jres").value,emo:$("jemo").value,grade:$("jgrade").value.slice(0,1),mis,note:$("jnote").value.trim()}];
+  addXP(5);render();toast("Entry saved 📓")}
+
+/* ---- Community ---- */
+let curChan="beginner-help";
+function vCommunity(){
+  return `<div class="wrap" style="display:flex;flex-direction:column;height:calc(100vh - 150px)">
+  <h2>💬 Community</h2><p class="sub">Open channels — every member sees every message.${remote()?"":" (Local mode: messages stay on this device until Supabase is connected.)"}</p>
+  <div class="row" style="overflow-x:auto;padding-bottom:6px">${CHANNELS.map(c=>`<button class="chan ${curChan===c?"on":""}" onclick="curChan='${c}';loadChat();render()"># ${c}</button>`).join("")}</div>
+  <div class="card" id="chatbox" style="flex:1;overflow-y:auto;margin:10px 0"><span class="dim" style="font-size:13px">Loading…</span></div>
+  <div class="row"><input id="cmsg" class="inp" style="flex:1" placeholder="Message # ${curChan}" onkeydown="if(event.key==='Enter')sendChat()">
+  <button class="btn" style="padding:12px 16px" onclick="sendChat()">Send</button></div></div>`}
+async function loadChat(){
+  const box=$("chatbox");if(!box)return;
+  const m=await kvGet(K.chat(curChan),[]);
+  box.innerHTML=m.length?m.map(x=>`<div style="margin-bottom:10px;${x.u===S.user.name?"text-align:right":""}">
+   <div class="mono" style="font-size:10px;color:${x.u==="pavan"?"var(--gold)":"var(--dim)"};margin-bottom:2px">${x.u==="pavan"?"👑 pavan (mentor)":esc(x.u)} · ${new Date(x.ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>
+   <div style="display:inline-block;padding:8px 12px;border-radius:12px;font-size:14px;max-width:85%;text-align:left;word-break:break-word;background:${x.u===S.user.name?"#2A3552":"#0E1626"};border:1px solid ${x.u==="pavan"?"var(--gold)":"var(--line)"}">${esc(x.t)}</div></div>`).join("")
+  :'<span class="dim" style="font-size:13px">No messages in #'+curChan+' yet. Open the discussion.</span>';
+  box.scrollTop=box.scrollHeight;
+}
+async function sendChat(){
+  const v=$("cmsg").value.trim();if(!v)return;$("cmsg").value="";
+  const m=await kvGet(K.chat(curChan),[]);
+  m.push({u:S.user.name,t:v.slice(0,500),ts:Date.now()});
+  await kvSet(K.chat(curChan),m.slice(-120));loadChat();
+}
+
+/* ---- Support ---- */
+function vSupport(){return `<div class="wrap"><h2>🛟 Support</h2>
+ <p class="sub">Saved to the mentor's inbox here, and your mail app opens pre-addressed so it also reaches his email.</p>
+ <div class="card"><label class="dim" style="font-size:12px">Subject</label>
+ <input id="ssub" class="inp" style="margin:6px 0 14px" placeholder="e.g. Doubt in order blocks lesson">
+ <label class="dim" style="font-size:12px">Message</label>
+ <textarea id="sbody" class="inp" style="margin:6px 0 14px;min-height:120px"></textarea>
+ <button class="btn" style="width:100%" onclick="sendSupport()">Send to mentor</button>
+ <div id="sok" class="bull" style="font-size:13px;margin-top:10px"></div></div></div>`}
+async function sendSupport(){
+  const b=$("sbody").value.trim();if(!b)return;
+  const arr=await kvGet(K.support,[]);
+  arr.push({u:S.user.name,subject:$("ssub").value.trim()||"(no subject)",body:b,ts:Date.now()});
+  await kvSet(K.support,arr.slice(-200));
+  window.open(`mailto:${MENTOR_EMAIL}?subject=${encodeURIComponent("[FX-OS] "+($("ssub").value||"Support")+" — from "+S.user.name)}&body=${encodeURIComponent(b)}`,"_blank");
+  $("sok").textContent="✓ Saved to mentor inbox — email draft opened.";$("ssub").value="";$("sbody").value="";
+}
+
+/* ---- Admin ---- */
+function vAdmin(){return `<div class="wrap"><h2>👑 Mentor Console</h2>
+ <p class="sub">${remote()?"🟢 Supabase connected — global sync active":"🟡 Local mode — fill SUPABASE config in this file for global logins, chat & leaderboard"}</p>
+ <div class="card" style="margin-bottom:12px"><b>Create student login</b>
+  <input id="au" class="inp" style="margin:10px 0 8px" placeholder="username" autocapitalize="none">
+  <input id="ap" class="inp" style="margin-bottom:10px" placeholder="password">
+  <button class="btn" style="width:100%" onclick="addUser()">Create user</button></div>
+ <div class="card" style="margin-bottom:12px"><b>Members</b><div id="ulist" class="dim" style="font-size:13px;margin-top:8px">Loading…</div></div>
+ <div class="card" style="margin-bottom:12px"><b>Support inbox</b><div id="inbox" class="dim" style="font-size:13px;margin-top:8px">Loading…</div></div>
+ <div class="card"><b>Settings</b>
+  <div class="row" style="margin:10px 0"><input id="apw" class="inp" type="password" style="flex:1" placeholder="new admin password">
+  <button class="ghost" style="color:var(--gold);border-color:var(--gold)" onclick="chPw()">Update</button></div>
+  <button class="ghost" style="width:100%;color:var(--bear);border-color:var(--bear)" onclick="clearChan()">Clear # ${curChan} channel</button></div></div>`}
+async function loadAdmin(){
+  const users=await kvGet(K.users,{}),ul=$("ulist");
+  if(ul)ul.innerHTML=Object.entries(users).map(([n,r])=>`<div class="row" style="justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)">
+   <span><b style="color:var(--text)">${r.role==="admin"?"👑 ":""}${esc(n)}</b> <span class="mono" style="font-size:10px">${new Date(r.created).toLocaleDateString()}</span></span>
+   ${n!=="pavan"?`<button class="ghost" style="padding:5px 10px;font-size:12px;color:var(--bear);border-color:var(--bear)" onclick="rmUser('${esc(n)}')">Remove</button>`:""}</div>`).join("");
+  const inbox=await kvGet(K.support,[]),ib=$("inbox");
+  if(ib)ib.innerHTML=inbox.length?inbox.slice().reverse().map(m=>`<div style="border-bottom:1px solid var(--line);padding:9px 0">
+   <div class="mono gold" style="font-size:11px">${esc(m.u)} · ${new Date(m.ts).toLocaleString()}</div>
+   <b style="color:var(--text);font-size:14px">${esc(m.subject)}</b>
+   <p style="font-size:13px;color:#C4CFE4;margin-top:3px">${esc(m.body)}</p></div>`).join(""):"No messages yet.";
+}
+async function addUser(){
+  const n=$("au").value.trim().toLowerCase(),p=$("ap").value;
+  if(!n||!p)return toast("Enter username and password");
+  const u=await kvGet(K.users,{});if(u[n])return toast("Username exists");
+  u[n]={p:btoa(p),role:"student",created:Date.now()};await kvSet(K.users,u);
+  $("au").value="";$("ap").value="";toast("Created '"+n+"' ✓");loadAdmin();
+}
+async function rmUser(n){const u=await kvGet(K.users,{});delete u[n];await kvSet(K.users,u);toast("Removed "+n);loadAdmin()}
+async function chPw(){const p=$("apw").value;if(!p)return;const u=await kvGet(K.users,{});u.pavan.p=btoa(p);await kvSet(K.users,u);$("apw").value="";toast("Admin password updated ✓")}
+async function clearChan(){await kvSet(K.chat(curChan),[]);toast("#"+curChan+" cleared")}
+
+/* ═══════════ ROUTER ═══════════ */
+const NAV=[["home","🏠","Home"],["academy","📚","Academy"],["practice","📈","Practice"],["dungeon","⚔️","Dungeon"],["journal","📓","Journal"],["community","💬","Chat"],["support","🛟","Help"]];
+function render(){
+  const app=$("app");
+  if(S.chatTimer){clearInterval(S.chatTimer);S.chatTimer=null}
+  if(!S.user){app.innerHTML=vLogin();return}
+  const nav=S.user.role==="admin"?[...NAV,["admin","👑","Admin"]]:NAV;
+  const tick=Object.entries(SYM).map(([s,v])=>{const c=gen(s,50,42);const l=c[c.length-1].c,p=c[c.length-2].c;
+    return `<span><span class="dim">${s} </span><span class="${l>=p?"bull":"bear"}">${fx(l)} ${l>=p?"▲":"▼"}</span></span>`}).join("");
+  const body={home:vHome,academy:vAcademy,lesson:vLesson,dc:vDC,practice:vPractice,dungeon:vDungeon,journal:vJournal,community:vCommunity,support:vSupport,admin:vAdmin}[S.tab]();
+  app.innerHTML=`
+  <header><div class="row" style="justify-content:space-between;padding:10px 16px">
+   <b style="letter-spacing:-.5px">FX-<span class="gold">OS</span></b>
+   <div class="row"><span class="mono gold" style="font-size:11px">⚡${S.prog.xp||0}</span>
+    <span class="mono gold" style="font-size:11px">🔥${S.prog.streak||0}</span>
+    <span class="mono dim" style="font-size:11px">${esc(S.user.name)}</span>
+    <button class="ghost" style="padding:5px 10px;font-size:11px" onclick="logout()">Out</button></div></div>
+   <div class="ticker"><div>${tick}${tick}</div></div></header>
+  <main style="padding-bottom:92px">${body}</main>
+  <nav class="bottom">${nav.map(([id,ic,lb])=>`<button class="${S.tab===id?"on":""}" onclick="stopSim();S.tab='${id}';render()"><div class="ic">${ic}</div>${lb}</button>`).join("")}</nav>`;
+  if(S.tab==="home")loadBoard();
+  if(S.tab==="practice"||(S.tab==="dungeon"&&S.view.tier!==undefined))updateSimUI();
+  if(S.tab==="community"){loadChat();S.chatTimer=setInterval(loadChat,4000)}
+  if(S.tab==="admin")loadAdmin();
+}
+render();
+</script>
+</body>
+</html>
